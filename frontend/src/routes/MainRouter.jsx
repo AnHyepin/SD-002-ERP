@@ -1,0 +1,55 @@
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+
+// Operation
+import StoreManagementPage from '../pages/operation/StoreManagementPage';
+import UserManagementPage from '../pages/operation/UserManagementPage';
+import MaterialManagementPage from '../pages/operation/MaterialManagementPage';
+import BomManagementPage from '../pages/operation/BomManagementPage';
+
+// Inventory
+import BranchInventoryPage from '../pages/inventory/BranchInventoryPage';
+import StoreInventoryPage from '../pages/inventory/StoreInventoryPage';
+
+// Supply
+import SupplyRequestPage from '../pages/supply/SupplyRequestPage';
+import DeliveryInstructionPage from '../pages/supply/DeliveryInstructionPage';
+import DeliveryProcessPage from '../pages/supply/DeliveryProcessPage';
+
+// Other main pages
+import ManufacturingPage from '../pages/ManufacturingPage';
+import QualityPage from '../pages/QualityPage';
+import SalesPage from '../pages/SalesPage';
+import SettlementPage from '../pages/SettlementPage';
+
+const MainRouter = () => {
+  return (
+    <Routes>
+      {/* Operation Routes */}
+      <Route path="/operation/store" element={<StoreManagementPage />} />
+      <Route path="/operation/user" element={<UserManagementPage />} />
+      <Route path="/operation/material" element={<MaterialManagementPage />} />
+      <Route path="/operation/bom" element={<BomManagementPage />} />
+
+      {/* Inventory Routes */}
+      <Route path="/inventory/branch" element={<BranchInventoryPage />} />
+      <Route path="/inventory/store" element={<StoreInventoryPage />} />
+
+      {/* Supply Routes */}
+      <Route path="/supply/request" element={<SupplyRequestPage />} />
+      <Route path="/supply/delivery" element={<DeliveryInstructionPage />} />
+      <Route path="/supply/process" element={<DeliveryProcessPage />} />
+
+      {/* Main Menu Routes */}
+      <Route path="/manufacturing" element={<ManufacturingPage />} />
+      <Route path="/quality" element={<QualityPage />} />
+      <Route path="/sales" element={<SalesPage />} />
+      <Route path="/settlement" element={<SettlementPage />} />
+
+      {/* Default Route */}
+      <Route path="/" element={<ManufacturingPage />} />
+    </Routes>
+  );
+};
+
+export default MainRouter; 

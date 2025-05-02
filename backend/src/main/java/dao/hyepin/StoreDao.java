@@ -1,9 +1,10 @@
 package dao.hyepin;
 
-import dto.StoreDto;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
+import dto.StoreDto;
 
 @Mapper
 public interface StoreDao {
@@ -13,4 +14,5 @@ public interface StoreDao {
     public int addStore(StoreDto storeDto);
     public int updateStore(StoreDto storeDto);
     public int deleteStore(int id);
+    public Integer getLastStoreNumber(String regionCode);
 }

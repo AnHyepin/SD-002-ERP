@@ -5,9 +5,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tbl_store", uniqueConstraints = {
-    @UniqueConstraint(columnNames = "store_code")
-})
+@Table(name = "tbl_store")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,21 +18,21 @@ public class Store {
     @Column(name = "store_id")
     private Long storeId;
 
-    @Column(name = "store_name", nullable = false, length = 100)
+    @Column(name = "store_name")
     private String storeName;
 
-    @Column(name = "store_code", nullable = false, length = 20, unique = true)
+    @Column(name = "store_code")
     private String storeCode;
 
-    @Column(name = "location", length = 255)
+    @Column(name = "location")
     private String location;
 
-    @Column(name = "contact", length = 50)
+    @Column(name = "contact")
     private String contact;
 
-    @Column(name = "manager_name", length = 100)
+    @Column(name = "manager_name")
     private String managerName;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 } 

@@ -75,18 +75,7 @@ public class StoreService {
 
     //전체 매장 조회
     public List<StoreDto> getAllStores() {
-        List<Store> stores = storeRepository.findAll();
-        log.info("{}", stores);
-        return stores.stream()
-                .map(store -> StoreDto.builder()
-                        .storeId(store.getStoreId())
-                        .storeName(store.getStoreName())
-                        .storeCode(store.getStoreCode())
-                        .location(store.getLocation())
-                        .contact(store.getContact())
-                        .managerName(store.getManagerName())
-                        .createdAt(store.getCreatedAt())
-                        .build())
-                .collect(Collectors.toList());
+        List<StoreDto> stores = storeDao.findAll();
+        return stores;
     }
 }

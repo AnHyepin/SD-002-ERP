@@ -8,6 +8,7 @@ import com.example.backend.dto.StoreDto;
 
 @Mapper
 public interface StoreDao {
+    public List<StoreDto> findAll();
     public StoreDto getStoreById(int id);
     public StoreDto getStoreByName(String name);
     public List<StoreDto> getAllStores();

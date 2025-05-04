@@ -1,10 +1,10 @@
-package dao.hyepin;
+package com.example.backend.dao.hyepin;
 
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import dto.StoreDto;
+import com.example.backend.dto.StoreDto;
 
 @Mapper
 public interface StoreDao {

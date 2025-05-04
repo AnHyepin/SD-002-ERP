@@ -1,17 +1,23 @@
-package service;
+package com.example.backend.service.hyepin;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import dao.hyepin.GubnDao;
-import dao.hyepin.StoreDao;
-import dto.GubnDto;
+import com.example.backend.dao.hyepin.GubnDao;
+import com.example.backend.dao.hyepin.StoreDao;
+import com.example.backend.dto.GubnDto;
+import com.example.backend.dto.StoreDto;
+import com.example.backend.entity.Store;
+import com.example.backend.repository.StoreRepository;
 
 @Service
-public class StoreCodeGenerator {
+@Slf4j
+public class StoreService {
 
     protected static final String REGION_GROUP_CODE = "region_code";
 
@@ -20,6 +26,9 @@ public class StoreCodeGenerator {
 
     @Autowired
     private StoreDao storeDao;
+
+    @Autowired
+    private StoreRepository storeRepository;
 
     /**
      * 지역 코드를 기반으로 매장 코드를 생성합니다.
@@ -62,5 +71,22 @@ public class StoreCodeGenerator {
      */
     public List<GubnDto> getRegionCodeList() {
         return gubnMapper.getGubnList(REGION_GROUP_CODE);
+    }
+
+    //전체 매장 조회
+    public List<StoreDto> getAllStores() {
+        List<Store> stores = storeRepository.findAll();
+        log.info("{}", stores);
+        return stores.stream()
+                .map(store -> StoreDto.builder()
+                        .storeId(store.getStoreId())
+                        .storeName(store.getStoreName())
+                        .storeCode(store.getStoreCode())
+                        .location(store.getLocation())
+                        .contact(store.getContact())
+                        .managerName(store.getManagerName())
+                        .createdAt(store.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

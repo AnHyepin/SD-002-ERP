@@ -1,10 +1,12 @@
-package dto;
+package com.example.backend.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 public class StoreDto {
     private Long storeId;
     private String storeName;

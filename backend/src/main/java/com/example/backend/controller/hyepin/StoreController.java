@@ -25,8 +25,8 @@ public class StoreController {
     }
 
     // 매장 코드 생성
-    @PostMapping("/code/generate")
-    public ResponseEntity<String> generateStoreCode(@RequestParam("regionCode") String regionCode) {
+    @PostMapping("/code/generate/{regionCode}")
+    public ResponseEntity<String> generateStoreCode(@PathVariable String regionCode) {
         try {
             String storeCode = storeService.generateStoreCode(regionCode);
             return ResponseEntity.ok(storeCode);
@@ -36,18 +36,46 @@ public class StoreController {
     }
 
     // 지역별 매장 조회
-    @GetMapping("/regions")
-    public ResponseEntity<List<StoreDto>> getRegionCodes(@RequestParam("regionCode") String regionCode) {
+    @GetMapping("/regions/{regionCode}")
+    public ResponseEntity<List<StoreDto>> getRegionCodes(@PathVariable String regionCode) {
         List<StoreDto> regionCodes = storeService.getStoreListByRegion(regionCode);
         return ResponseEntity.ok(regionCodes);
     }
 
     //지역코드, 이름으로 조회
-    @GetMapping("/name")
-    public ResponseEntity<List<StoreDto>> getRegionCodeList(@RequestParam("storeName") String storeName) {
+    @GetMapping("/name/{storeName}")
+    public ResponseEntity<List<StoreDto>> getRegionCodeList(@PathVariable String storeName) {
         List<StoreDto> regionList = storeService.getStoreListByName(storeName);
         return ResponseEntity.ok(regionList);
     }
 
+    // 매장 등록
+    @PostMapping
+    public ResponseEntity<StoreDto> createStore(@RequestBody StoreDto storeDto) {
+        try {
+            StoreDto createdStore = storeService.createStore(storeDto);
+            return ResponseEntity.ok(createdStore);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
+    // 매장 수정
+    @PutMapping("/{storeId}")
+    public ResponseEntity<StoreDto> updateStore(@PathVariable Long storeId, @RequestBody StoreDto storeDto) {
+        try {
+            storeDto.setStoreId(storeId);
+            StoreDto updatedStore = storeService.updateStore(storeDto);
+            return ResponseEntity.ok(updatedStore);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    //매장 삭제
+    @DeleteMapping("/{storeId}")
+    public ResponseEntity<Integer> deleteStore(@PathVariable int storeId) {
+        int result = storeService.deleteStore(storeId);
+        return ResponseEntity.ok(result);
+    }
 }

@@ -50,8 +50,20 @@ public class StoreService {
         return regionCode + newNumber;
     }
 
+    // 매장 코드에서 지역 코드 추출
+    private String extractRegionCode(String storeCode) {
+        if (storeCode == null || storeCode.length() < 2) {
+            throw new IllegalArgumentException("Invalid store code format");
+        }
+        return storeCode.substring(0, 2);
+    }
+
     // 지역으로 조회
     public List<StoreDto> getStoreListByRegion(String regionCode) {
+        // 지역 코드가 2글자가 아닌 경우 처리
+        if (regionCode.length() > 2) {
+            regionCode = regionCode.substring(0, 2);
+        }
         return storeDao.getStoreListByRegion(regionCode);
     }
 
@@ -64,5 +76,62 @@ public class StoreService {
     public List<StoreDto> getAllStores() {
         List<StoreDto> stores = storeDao.findAll();
         return stores;
+    }
+
+    //매장 삭제
+    public int deleteStore(int storeId) {
+        return storeDao.deleteStore(storeId);
+    }
+
+    // 매장 등록
+    @Transactional
+    public StoreDto createStore(StoreDto storeDto) {
+        // 매장 코드 유효성 검사
+        if (storeDto.getStoreCode() == null || storeDto.getStoreCode().isEmpty()) {
+            throw new IllegalArgumentException("Store code is required");
+        }
+
+        // 매장명 중복 검사
+        List<StoreDto> existingStores = storeDao.getStoreListByName(storeDto.getStoreName());
+        if (!existingStores.isEmpty()) {
+            throw new IllegalArgumentException("Store name already exists");
+        }
+
+        // 매장 등록
+        storeDao.addStore(storeDto);
+        return storeDto;
+    }
+
+    // 매장 수정
+    @Transactional
+    public StoreDto updateStore(StoreDto storeDto) {
+        // 매장 존재 여부 확인
+        StoreDto existingStore = storeDao.getStoreById(storeDto.getStoreId().intValue());
+        if (existingStore == null) {
+            throw new IllegalArgumentException("Store not found");
+        }
+
+        // 매장명 중복 검사 (자기 자신 제외)
+        List<StoreDto> existingStores = storeDao.getStoreListByName(storeDto.getStoreName());
+        if (!existingStores.isEmpty() && !existingStores.get(0).getStoreId().equals(storeDto.getStoreId())) {
+            throw new IllegalArgumentException("Store name already exists");
+        }
+
+        // 지역 변경 여부 확인
+        String newRegionCode = extractRegionCode(storeDto.getStoreCode());
+        String oldRegionCode = extractRegionCode(existingStore.getStoreCode());
+
+        if (!newRegionCode.equals(oldRegionCode)) {
+            // 지역이 변경된 경우 새로운 매장 코드 생성
+            String newStoreCode = generateStoreCode(newRegionCode);
+            storeDto.setStoreCode(newStoreCode);
+        } else {
+            // 같은 지역인 경우 기존 매장 코드 유지
+            storeDto.setStoreCode(existingStore.getStoreCode());
+        }
+
+        // 매장 수정
+        storeDao.updateStore(storeDto);
+        return storeDto;
     }
 }

@@ -9,7 +9,7 @@
     </select>
 
     <select id="getStoreById" resultType="com.example.backend.dto.StoreDto">
-        SELECT * FROM tbl_store WHERE store_id = #{id}
+        SELECT * FROM tbl_store WHERE store_id = #{storeId}
     </select>
 
     <select id="getStoreByName" resultType="com.example.backend.dto.StoreDto">
@@ -36,7 +36,7 @@
     </update>
 
     <delete id="deleteStore">
-        DELETE FROM tbl_store WHERE store_id = #{id}
+        DELETE FROM tbl_store WHERE store_id = #{storeId}
     </delete>
 
     <select id="getLastStoreNumber" resultType="java.lang.Integer">
@@ -56,6 +56,5 @@
         FROM tbl_store
         WHERE store_name LIKE CONCAT('%', #{storeName}, '%')
     </select>
-
 
 </mapper>

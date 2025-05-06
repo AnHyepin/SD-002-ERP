@@ -17,6 +17,7 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  MenuItem,
 } from '@mui/material';
 
 function StoreManagementPage() {
@@ -24,6 +25,8 @@ function StoreManagementPage() {
   const [stores, setStores] = useState([]); // 매장 목록
   const [open, setOpen] = useState(false); // 다이얼로그 열림/닫힘 상태
   const [selectedStore, setSelectedStore] = useState(null); // 선택된 매장
+  const [managerOptions, setManagerOptions] = useState([]);
+  const [selectedRegion, setSelectedRegion] = useState(''); // 선택된 지역
   const [formData, setFormData] = useState({
     storeName: '',
     location: '',
@@ -32,21 +35,41 @@ function StoreManagementPage() {
     createdAt: '',
   });
 
+  // 지역코드 가져오기
+  const getStoreCode = async () => {
+    try {
+      const groupCode = 'region_code';
+      const res = await axios.get(`/api/gubn/${groupCode}`);
+      setManagerOptions(res.data);
+      console.log(res.data);
+    } catch (error) {
+      console.error('지역코드를 가져오는데 실패했습니다:', error);
+    }
+  };
+
   // 매장 목록 가져오기
   const fetchStores = async () => {
     try {
-      // const response = await fetch('/api/stores');
-      // const data = await response.json();
       const res = await axios.get('/api/stores');
-      const data = res.data;
-      setStores(data);
+      setStores(res.data);
     } catch (error) {
       console.error('매장 목록을 가져오는데 실패했습니다:', error);
     }
   };
 
-  // 페이지 로드시 매장 목록 가져오기
+  // 지역별 매장 필터링
+  const filteredStores = selectedRegion
+    ? stores.filter(store => store.storeCode.startsWith(selectedRegion))
+    : stores;
+
+  // 지역 선택 처리
+  const handleRegionChange = (event) => {
+    setSelectedRegion(event.target.value);
+  };
+
+  // 페이지 로드시 매장 목록, 지역코드 가져오기
   useEffect(() => {
+    getStoreCode();
     fetchStores();
   }, []);
 
@@ -54,7 +77,10 @@ function StoreManagementPage() {
   const handleOpen = (store = null) => {
     if (store) {
       setSelectedStore(store);
-      setFormData(store);
+      setFormData({
+        ...store,
+        storeCode: store.storeCode.substring(0, 2) // 지역 코드만 추출
+      });
     } else {
       setSelectedStore(null);
       setFormData({
@@ -63,6 +89,7 @@ function StoreManagementPage() {
         contact: '',
         managerName: '',
         createdAt: '',
+        storeCode: ''
       });
     }
     setOpen(true);
@@ -93,29 +120,38 @@ function StoreManagementPage() {
   // 매장 등록/수정 처리
   const handleSubmit = async () => {
     try {
+      if (!formData.storeCode) {
+        alert('지역을 선택해주세요.');
+        return;
+      }
+
+      let storeCode;
+      if (!selectedStore) {
+        // 매장 코드 생성
+        const codeResponse = await axios.post(`/api/stores/code/generate/${formData.storeCode}`);
+        storeCode = codeResponse.data;
+      } else {
+        storeCode = selectedStore.storeCode;
+      }
+
+      const storeData = {
+        ...formData,
+        storeCode
+      };
+
       if (selectedStore) {
         // 수정
-        await fetch(`/api/stores/${selectedStore.storeId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        });
+        await axios.put(`/api/stores/${selectedStore.storeId}`, storeData);
       } else {
         // 등록
-        await fetch('/api/stores', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        });
+        await axios.post('/api/stores', storeData);
       }
+      
       handleClose();
       fetchStores();
     } catch (error) {
       console.error('매장 저장에 실패했습니다:', error);
+      alert('매장 저장에 실패했습니다.');
     }
   };
 
@@ -123,12 +159,17 @@ function StoreManagementPage() {
   const handleDelete = async (storeId) => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
       try {
-        await fetch(`/api/stores/${storeId}`, {
-          method: 'DELETE',
-        });
+        const res = await axios.delete(`/api/stores/${storeId}`);
+        const data = res.data;
+        if (res.status === 200 && res.data > 0) {
+          alert('삭제 성공!');
+        } else {
+          alert('삭제 실패 또는 해당 항목 없음');
+        }
         fetchStores();
       } catch (error) {
-        console.error('매장 삭제에 실패했습니다:', error);
+        alert('서버 오류로 삭제에 실패했습니다.');
+        console.error('매장 삭제 실패:', error);
       }
     }
   };
@@ -150,6 +191,24 @@ function StoreManagementPage() {
           </Button>
         </Box>
 
+        {/* 지역 필터 */}
+        <Box sx={{ mb: 2 }}>
+          <TextField
+            select
+            label="지역 선택"
+            value={selectedRegion}
+            onChange={handleRegionChange}
+            sx={{ minWidth: 200 }}
+          >
+            <MenuItem value="">전체</MenuItem>
+            {managerOptions.map((option) => (
+              <MenuItem key={option.gubnCode} value={option.gubnCode}>
+                {option.gubnName}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
+
         {/* 매장 목록 테이블 */}
         <TableContainer component={Paper}>
           <Table>
@@ -164,7 +223,7 @@ function StoreManagementPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {stores.map((store) => (
+              {filteredStores.map((store) => (
                 <TableRow key={store.storeId}>
                   <TableCell>{store.storeName}</TableCell>
                   <TableCell>{store.location}</TableCell>
@@ -205,44 +264,61 @@ function StoreManagementPage() {
               <TextField
                 autoFocus
                 margin="dense"
-                name="name"
+                name="storeName"
                 label="매장명"
                 type="text"
                 fullWidth
-                value={formData.name}
+                value={formData.storeName}
                 onChange={handleChange}
                 required
               />
               <TextField
+                  select
+                  margin="dense"
+                  name="storeCode"
+                  label="지역"
+                  fullWidth
+                  value={formData.storeCode}
+                  onChange={handleChange}
+                  required
+              >
+                {managerOptions.map((option) => (
+                    <MenuItem key={option.gubnCode} value={option.gubnCode}>
+                      {option.gubnName}
+                    </MenuItem>
+                ))}
+              </TextField>
+              <TextField
                 margin="dense"
-                name="address"
+                name="location"
                 label="주소"
                 type="text"
                 fullWidth
-                value={formData.address}
+                value={formData.location}
                 onChange={handleChange}
                 required
               />
               <TextField
                 margin="dense"
-                name="phone"
+                name="contact"
                 label="전화번호"
                 type="text"
                 fullWidth
-                value={formData.phone}
+                value={formData.contact}
                 onChange={handleChange}
                 required
               />
               <TextField
                 margin="dense"
-                name="manager"
+                name="managerName"
                 label="담당자"
                 type="text"
                 fullWidth
-                value={formData.manager}
+                value={formData.managerName}
                 onChange={handleChange}
                 required
               />
+
             </Box>
           </DialogContent>
           <DialogActions>

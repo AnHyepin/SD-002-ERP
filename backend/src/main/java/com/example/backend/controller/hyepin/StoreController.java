@@ -26,7 +26,7 @@ public class StoreController {
 
     // 매장 코드 생성
     @PostMapping("/code/generate")
-    public ResponseEntity<String> generateStoreCode(@RequestParam String regionCode) {
+    public ResponseEntity<String> generateStoreCode(@RequestParam("regionCode") String regionCode) {
         try {
             String storeCode = storeService.generateStoreCode(regionCode);
             return ResponseEntity.ok(storeCode);
@@ -37,19 +37,15 @@ public class StoreController {
 
     // 지역별 매장 조회
     @GetMapping("/regions")
-    public ResponseEntity<List<String>> getRegionCodes() {
-        List<String> regionCodes = storeService.getRegionCodes();
+    public ResponseEntity<List<StoreDto>> getRegionCodes(@RequestParam("regionCode") String regionCode) {
+        List<StoreDto> regionCodes = storeService.getStoreListByRegion(regionCode);
         return ResponseEntity.ok(regionCodes);
     }
 
-    /**
-     * 지역 코드와 이름 목록을 조회합니다.
-     * 
-     * @return 지역 코드와 이름 목록
-     */
-    @GetMapping("/regions/detail")
-    public ResponseEntity<List<GubnDto>> getRegionCodeList() {
-        List<GubnDto> regionList = storeService.getRegionCodeList();
+    //지역코드, 이름으로 조회
+    @GetMapping("/name")
+    public ResponseEntity<List<StoreDto>> getRegionCodeList(@RequestParam("storeName") String storeName) {
+        List<StoreDto> regionList = storeService.getStoreListByName(storeName);
         return ResponseEntity.ok(regionList);
     }
 

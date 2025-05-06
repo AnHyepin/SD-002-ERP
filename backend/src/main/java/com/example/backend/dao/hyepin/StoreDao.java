@@ -16,4 +16,7 @@ public interface StoreDao {
     public int updateStore(StoreDto storeDto);
     public int deleteStore(int id);
     public Integer getLastStoreNumber(String regionCode);
+    public List<StoreDto> getStoreListByRegion(String regionCode);
+    public List<StoreDto> getStoreListByName(String storeName);
+
 }

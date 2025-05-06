@@ -22,7 +22,7 @@ public class StoreService {
     protected static final String REGION_GROUP_CODE = "region_code";
 
     @Autowired
-    private GubnDao gubnMapper;
+    private GubnDao gubnDao;
 
     @Autowired
     private StoreDao storeDao;
@@ -30,16 +30,11 @@ public class StoreService {
     @Autowired
     private StoreRepository storeRepository;
 
-    /**
-     * 지역 코드를 기반으로 매장 코드를 생성합니다.
-     * 
-     * @param regionCode 지역 코드 (예: "JJ")
-     * @return 생성된 매장 코드 (예: "JJ1")
-     */
+    // 매장 코드 생성
     @Transactional(readOnly = true)
     public String generateStoreCode(String regionCode) {
         // 1. 지역 코드가 유효한지 확인
-        int count = gubnMapper.checkGubn(REGION_GROUP_CODE, regionCode);
+        int count = gubnDao.checkGubn(REGION_GROUP_CODE, regionCode);
 
         if (count == 0) {
             throw new IllegalArgumentException("Invalid region code: " + regionCode);
@@ -55,22 +50,14 @@ public class StoreService {
         return regionCode + newNumber;
     }
 
-    /**
-     * 지역 코드 목록을 조회합니다.
-     * 
-     * @return 지역 코드 목록
-     */
-    public List<String> getRegionCodes() {
-        return gubnMapper.getGubnCodes(REGION_GROUP_CODE);
+    // 지역으로 조회
+    public List<StoreDto> getStoreListByRegion(String regionCode) {
+        return storeDao.getStoreListByRegion(regionCode);
     }
 
-    /**
-     * 지역 코드와 이름을 함께 조회합니다.
-     * 
-     * @return 지역 코드와 이름 목록
-     */
-    public List<GubnDto> getRegionCodeList() {
-        return gubnMapper.getGubnList(REGION_GROUP_CODE);
+    // 이름으로 조회
+    public List<StoreDto> getStoreListByName(String storeName) {
+        return storeDao.getStoreListByName(storeName);
     }
 
     //전체 매장 조회

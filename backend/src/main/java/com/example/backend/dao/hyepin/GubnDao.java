@@ -16,5 +16,5 @@ public interface GubnDao {
     public int checkGubn(String groupCode, String gubnCode);
 
     // 특정 그룹의 코드 목록만 조회
-    public List<String> getGubnCodes(String groupCode);
+    public List<String> getGubnCodes(String groupCode, String gubnCode);
 }

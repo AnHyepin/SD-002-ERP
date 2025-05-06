@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   Box,
   Button,
@@ -24,18 +25,20 @@ function StoreManagementPage() {
   const [open, setOpen] = useState(false); // 다이얼로그 열림/닫힘 상태
   const [selectedStore, setSelectedStore] = useState(null); // 선택된 매장
   const [formData, setFormData] = useState({
-    name: '',
-    address: '',
-    phone: '',
-    manager: '',
+    storeName: '',
+    location: '',
+    contact: '',
+    managerName: '',
+    createdAt: '',
   });
 
   // 매장 목록 가져오기
   const fetchStores = async () => {
     try {
-      // TODO: 실제 API 연동
-      const response = await fetch('/api/stores');
-      const data = await response.json();
+      // const response = await fetch('/api/stores');
+      // const data = await response.json();
+      const res = await axios.get('/api/stores');
+      const data = res.data;
       setStores(data);
     } catch (error) {
       console.error('매장 목록을 가져오는데 실패했습니다:', error);
@@ -55,10 +58,11 @@ function StoreManagementPage() {
     } else {
       setSelectedStore(null);
       setFormData({
-        name: '',
-        address: '',
-        phone: '',
-        manager: '',
+        storeName: '',
+        location: '',
+        contact: '',
+        managerName: '',
+        createdAt: '',
       });
     }
     setOpen(true);
@@ -69,10 +73,11 @@ function StoreManagementPage() {
     setOpen(false);
     setSelectedStore(null);
     setFormData({
-      name: '',
-      address: '',
-      phone: '',
-      manager: '',
+      storeName: '',
+      location: '',
+      contact: '',
+      managerName: '',
+      createdAt: '',
     });
   };
 
@@ -90,7 +95,7 @@ function StoreManagementPage() {
     try {
       if (selectedStore) {
         // 수정
-        await fetch(`/api/stores/${selectedStore.id}`, {
+        await fetch(`/api/stores/${selectedStore.storeId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -115,10 +120,10 @@ function StoreManagementPage() {
   };
 
   // 매장 삭제 처리
-  const handleDelete = async (id) => {
+  const handleDelete = async (storeId) => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
       try {
-        await fetch(`/api/stores/${id}`, {
+        await fetch(`/api/stores/${storeId}`, {
           method: 'DELETE',
         });
         fetchStores();
@@ -154,16 +159,18 @@ function StoreManagementPage() {
                 <TableCell>주소</TableCell>
                 <TableCell>전화번호</TableCell>
                 <TableCell>담당자</TableCell>
+                <TableCell>생성일</TableCell>
                 <TableCell align="center">관리</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {stores.map((store) => (
-                <TableRow key={store.id}>
-                  <TableCell>{store.name}</TableCell>
-                  <TableCell>{store.address}</TableCell>
-                  <TableCell>{store.phone}</TableCell>
-                  <TableCell>{store.manager}</TableCell>
+                <TableRow key={store.storeId}>
+                  <TableCell>{store.storeName}</TableCell>
+                  <TableCell>{store.location}</TableCell>
+                  <TableCell>{store.contact}</TableCell>
+                  <TableCell>{store.managerName}</TableCell>
+                  <TableCell>{store.createdAt}</TableCell>
                   <TableCell align="center">
                     <Button
                       variant="outlined"
@@ -177,7 +184,7 @@ function StoreManagementPage() {
                       variant="outlined"
                       color="error"
                       size="small"
-                      onClick={() => handleDelete(store.id)}
+                      onClick={() => handleDelete(store.storeId)}
                     >
                       삭제
                     </Button>

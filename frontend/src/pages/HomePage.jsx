@@ -1,11 +1,16 @@
 import React from 'react';
+import styled from 'styled-components';
+
+const HomeContainer = styled.div`
+  padding: 20px;
+`;
 
 const HomePage = () => {
   return (
-    <div className="home-page">
-      <h2>홈</h2>
-      <p>ERP 시스템에 오신 것을 환영합니다.</p>
-    </div>
+    <HomeContainer>
+      <h1>홈페이지</h1>
+      <p>환영합니다!</p>
+    </HomeContainer>
   );
 };
 

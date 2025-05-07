@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import HomePage from '../pages/HomePage';
 
 // Operation
 import StoreManagementPage from '../pages/operation/StoreManagementPage';
@@ -47,7 +48,7 @@ const MainRouter = () => {
       <Route path="/settlement" element={<SettlementPage />} />
 
       {/* Default Route */}
-      <Route path="/" element={<ManufacturingPage />} />
+      <Route path="/" element={<HomePage />} />
     </Routes>
   );
 };

@@ -1,0 +1,222 @@
+/* 페이지 전체 컨테이너 */
+.register-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px ;
+}
+
+/* 폼 박스 */
+.register-form-box {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  padding: 40px 30px;
+}
+
+/* 타이틀/부제목 */
+.register-title {
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 45px;
+}
+
+/*.register-subtitle {*/
+/*  font-size: 14px;*/
+/*  color: #666;*/
+/*  text-align: center;*/
+/*  margin-bottom: 32px;*/
+/*}*/
+
+/* 폼 그룹 */
+.register-form-group {
+  margin-bottom: 24px;
+}
+
+/* 라벨 */
+.register-label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* 입력 필드 */
+.register-input,
+.register-select {
+  width: 100%;
+  height: 45px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 15px;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+.register-input:focus,
+.register-select:focus {
+  outline: none;
+  border-color: #0092ff;
+  box-shadow: 0 0 0 2px rgba(0,146,255,0.2);
+}
+
+/* 버튼 */
+.register-button {
+  height: 45px;
+  width: 100%;
+  background-color: #0092ff;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.register-button:hover {
+  background-color: #0078d7;
+}
+
+.register-button.font-size-20 {
+  font-size: 18px;
+}
+
+/* 비활성화 버튼 */
+.register-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* 에러 및 성공 메시지 */
+.register-error-message {
+  color: red;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.register-success-message {
+  color: green;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+/* 비밀번호 조건 */
+.register-password-requirements {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.register-password-requirements span {
+  font-size: 13px;
+  color: #999;
+}
+
+.register-password-requirements span.valid {
+  color: #007bff;
+}
+
+/* 아이디, 이메일, 휴대폰: 인풋 + 버튼 */
+.register-id-input-box {
+  display: flex;
+  height: 45px;
+  align-items: center;
+  border: 1px #ddd solid;
+  border-radius: 10px;
+}
+
+.register-id-input-box input {
+  height: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 0 10px;
+}
+
+.register-id-input-box button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 14px;
+  border-left: 1px #ddd solid;
+  border-radius: 0 10px 10px 0;
+  border: none;
+  width: 80px;
+  min-width: 80px;
+  background-color: #0092ff;
+  color: white;
+  cursor: pointer;
+}
+
+.register-id-input-box button:hover {
+  background-color: #007bff;
+}
+
+/* 이름 + 성별 */
+.register-name-gender-box {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.register-name-gender-box input {
+  width: 75%;
+}
+
+.register-name-gender-box select {
+  width: 25%;
+}
+
+/* 생년월일 */
+.register-birth-box {
+  display: flex;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.register-birth-box select {
+  flex: 1;
+}
+
+/* 이용약관 */
+.register-agree-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin:20px 0;
+  font-size: 14px;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+  color: #666;
+  cursor: pointer;
+}
+
+.register-agree-box input {
+  width: 16px;
+  height: 16px;
+}
+
+.register-close-button {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 40px;
+  color: #666;
+  text-decoration: none;
+}
+
+.register-close-button:hover {
+  color: #333;
+}

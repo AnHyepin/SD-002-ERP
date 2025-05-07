@@ -2,6 +2,10 @@ package com.example.backend.controller.hyepin;
 
 import java.util.List;
 
+import com.example.backend.entity.Store;
+import com.example.backend.repository.StoreRepository;
+import com.example.backend.service.hyepin.GubnService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,11 +15,15 @@ import com.example.backend.service.hyepin.StoreService;
 import com.example.backend.dto.StoreDto;
 
 @RestController
+@Slf4j
 @RequestMapping("/api/stores")
 public class StoreController {
 
     @Autowired
     private StoreService storeService;
+
+    @Autowired
+    private StoreRepository storeRepository;
 
     //전체 매장 조회
     @GetMapping
@@ -51,7 +59,7 @@ public class StoreController {
 
     // 매장 등록
     @PostMapping
-    public ResponseEntity<StoreDto> createStore(@RequestBody StoreDto storeDto) {
+    public ResponseEntity<StoreDto> createStore(@RequestBody  StoreDto storeDto) {
         try {
             StoreDto createdStore = storeService.createStore(storeDto);
             return ResponseEntity.ok(createdStore);
@@ -61,11 +69,11 @@ public class StoreController {
     }
 
     // 매장 수정
-    @PutMapping("/{storeId}")
-    public ResponseEntity<StoreDto> updateStore(@PathVariable Long storeId, @RequestBody StoreDto storeDto) {
+    @PutMapping
+    public ResponseEntity<Store> updateStore(@RequestBody Store store) {
+        log.info("storeDto: {}", store);
         try {
-            storeDto.setStoreId(storeId);
-            StoreDto updatedStore = storeService.updateStore(storeDto);
+            Store updatedStore = storeRepository.save(store);
             return ResponseEntity.ok(updatedStore);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

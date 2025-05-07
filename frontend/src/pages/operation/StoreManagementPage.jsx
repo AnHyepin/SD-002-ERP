@@ -141,10 +141,10 @@ function StoreManagementPage() {
 
       if (selectedStore) {
         // 수정
-        await axios.put(`/api/stores/${selectedStore.storeId}`, storeData);
+        await axios.put(`/api/stores`, storeData);
       } else {
         // 등록
-        await axios.post('/api/stores', storeData);
+        await axios.post(`/api/stores`, storeData);
       }
       
       handleClose();

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.dao.sangin.UserDao_sangin">
+
+    <select id="getAllUsers" resultType="com.example.backend.dto.UserDto">
+        SELECT * FROM tbl_user
+    </select>
+
+    <insert id="insertUser" parameterType="com.example.backend.dto.UserDto">
+        INSERT INTO tbl_user (username, email, department, role, is_active)
+        VALUES (#{username}, #{email}, #{department}, #{role}, #{isActive})
+    </insert>
+
+    <update id="updateUser" parameterType="com.example.backend.dto.UserDto">
+        UPDATE tbl_user
+        SET username = #{username},
+            email = #{email},
+            department = #{department},
+            role = #{role},
+            is_active = #{isActive}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteUser" parameterType="int">
+        DELETE FROM tbl_user WHERE id = #{id}
+    </delete>
+
+</mapper>

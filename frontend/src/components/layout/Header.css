@@ -4,6 +4,11 @@
   padding: 1rem 2rem;
 }
 
+.header-home-button{
+  text-decoration: none;
+  color: inherit;
+}
+
 .header-content {
   display: flex;
   justify-content: space-between;

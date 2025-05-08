@@ -53,4 +53,13 @@
   color: #333;
   text-decoration: none;
   display: block;
-} 
+}
+
+.menu-label {
+  display: inline-block;
+  text-decoration: none;
+  color: black;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+

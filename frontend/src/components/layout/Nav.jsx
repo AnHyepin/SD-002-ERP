@@ -67,13 +67,16 @@ const Nav = () => {
               <>
                 <span>{item.title}</span>
                 {activeMenu === key && (
-                  <ul className="sub-menu">
-                    {item.subItems.map((subItem) => (
-                      <li key={subItem.path}>
-                        <Link to={subItem.path}>{subItem.name}</Link>
-                      </li>
-                    ))}
-                  </ul>
+                    <ul className="sub-menu">
+                      {item.subItems.map((subItem) => (
+                          <li key={subItem.path}>
+                            <Link to={subItem.path} className="menu-label">
+                              {subItem.name}
+                            </Link>
+                          </li>
+                      ))}
+                    </ul>
+
                 )}
               </>
             ) : (

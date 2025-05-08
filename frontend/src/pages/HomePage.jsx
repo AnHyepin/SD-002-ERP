@@ -2,20 +2,28 @@ import React from 'react';
 import { Box, Typography, Grid, Card, CardContent, CardActionArea } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import PeopleIcon from '@mui/icons-material/People';
+import PetsIcon from '@mui/icons-material/Pets';
 
 const HomePage = () => {
   const navigate = useNavigate();
 
-  const menuItems = [
-    {
-      title: '사용자 관리',
-      description: '전체 사용자 계정 관리',
-      icon: <PeopleIcon sx={{ fontSize: 40 }} />,
-      path: '/user-management',
-    },
-  ];
+    const menuItems = [
+        {
+            title: '사용자 관리',
+            description: '전체 사용자 계정 관리',
+            icon: <PeopleIcon sx={{ fontSize: 40 }} />,
+            path: '/user-management',
+        },
+        {
+            title: '뭉이 연습용',
+            description: '뭉이 리액트 연습장',
+            icon: <PetsIcon sx={{ fontSize: 40, color: 'hotpink' }} />, // 귀엽고 눈에 띄게
+            path: '/store2',
+        },
+    ];
 
-  return (
+
+    return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" sx={{ mb: 4 }}>관리자 메뉴</Typography>
       <Grid container spacing={3}>

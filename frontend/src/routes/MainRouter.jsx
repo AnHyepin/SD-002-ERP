@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import HomePage from '../pages/HomePage';
 import UserManagementPage from '../pages/UserManagementPage';
+import Store2 from '../pages/operation/Store2';
 
 // Operation
 import StoreManagementPage from '../pages/operation/StoreManagementPage';
@@ -50,6 +51,7 @@ const MainRouter = () => {
       {/* Default Route */}
       <Route path="/" element={<HomePage />} />
       <Route path="/user-management" element={<UserManagementPage />} />
+      <Route path="/store2" element={<Store2 />} />
     </Routes>
   );
 };

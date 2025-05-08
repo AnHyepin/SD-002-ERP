@@ -8,11 +8,6 @@
         SELECT * FROM tbl_user
     </select>
 
-    <insert id="insertUser" parameterType="com.example.backend.dto.UserDto">
-        INSERT INTO tbl_user (username, email, department, role, is_active)
-        VALUES (#{username}, #{email}, #{department}, #{role}, #{isActive})
-    </insert>
-
     <update id="updateUser" parameterType="com.example.backend.dto.UserDto">
         UPDATE tbl_user
         SET username = #{username},
@@ -26,5 +21,67 @@
     <delete id="deleteUser" parameterType="int">
         DELETE FROM tbl_user WHERE id = #{id}
     </delete>
+
+    <select id="countByUsername" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM tbl_user WHERE username = #{username}
+    </select>
+
+    <select id="countByEmail" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM tbl_user WHERE email = #{email}
+    </select>
+
+    <select id="countByPhoneNumber" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM tbl_user WHERE phone_number = #{phoneNumber}
+    </select>
+
+    <!-- 회원가입 -->
+    <insert id="insertUser" parameterType="com.example.backend.dto.RegisterRequest">
+        INSERT INTO tbl_user (user_id,
+                              password,
+                              username,
+                              name,
+                              gender,
+                              birth_year,
+                              birth_month,
+                              birth_day,
+                              email,
+                              phone_number,
+                              agree_terms,
+                              created_at)
+        VALUES (null,
+                #{password},
+                #{username},
+                #{name},
+                #{gender},
+                #{birthYear},
+                #{birthMonth},
+                #{birthDay},
+                #{email},
+                #{phoneNumber},
+                #{agreeTerms},
+                NOW())
+    </insert>
+
+    <!-- 아이디 중복 확인 -->
+    <select id="checkDuplicateId" parameterType="string" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM tbl_user
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- 이메일 중복 확인 -->
+    <select id="checkDuplicateEmail" parameterType="string" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM tbl_user
+        WHERE email = #{email}
+    </select>
+
+    <!-- 전화번호 중복 확인 -->
+    <select id="checkDuplicatePhone" parameterType="string" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM tbl_user
+        WHERE phone_number = #{phoneNumber}
+    </select>
+
 
 </mapper>

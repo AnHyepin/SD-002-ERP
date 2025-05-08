@@ -5,9 +5,8 @@ import './Register.css';
 
 const Register = () => {
     const [formData, setFormData] = useState({
-        userId: '',
+        username: '',
         password: '',
-        passwordConfirm: '',
         name: '',
         gender: '',
         birthYear: '',
@@ -25,12 +24,12 @@ const Register = () => {
     const [isPhoneAvailable, setIsPhoneAvailable] = useState(false);
     const navigate = useNavigate();
 
-    const validateUserId = (userId) => {
-        if (/\s/.test(userId)) return "아이디에 공백이 포함될 수 없습니다.";
-        if (userId.length < 8 || userId.length > 20) return "아이디는 8자 이상, 20자 이하여야 합니다.";
-        if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/.test(userId))
+    const validateUsername = (username) => {
+        if (/\s/.test(username)) return "아이디에 공백이 포함될 수 없습니다.";
+        if (username.length < 8 || username.length > 20) return "아이디는 8자 이상, 20자 이하여야 합니다.";
+        if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/.test(username))
             return "아이디는 영문과 숫자를 조합해서 사용해야합니다.";
-        if (/(\w)\1\1/.test(userId)) return "아이디에 연속된 동일 문자/숫자가 3번 이상 포함될 수 없습니다.";
+        if (/(\w)\1\1/.test(username)) return "아이디에 연속된 동일 문자/숫자가 3번 이상 포함될 수 없습니다.";
         return null;
     };
 
@@ -53,19 +52,19 @@ const Register = () => {
     };
 
     const handleIdCheck = async () => {
-        const error = validateUserId(formData.userId);
+        const error = validateUsername(formData.username);
         if (error) {
-            setErrors(prev => ({...prev, userId: error}));
+            setErrors(prev => ({...prev, username: error}));
             return;
         }
 
         try {
-            const response = await axios.get(`http://localhost:8000/api/users/check-duplicate-id?userId=${formData.userId}`);
+            const response = await axios.get(`http://localhost:8000/api/users/check-duplicate-username?username=${formData.username}`);
             if (response.data.duplicate) {
-                setErrors(prev => ({...prev, userId: "이미 사용 중인 아이디입니다."}));
+                setErrors(prev => ({...prev, username: "이미 사용 중인 아이디입니다."}));
                 setIsIdAvailable(false);
             } else {
-                setErrors(prev => ({...prev, userId: null}));
+                setErrors(prev => ({...prev, username: null}));
                 setIsIdAvailable(true);
             }
         } catch (error) {
@@ -81,7 +80,7 @@ const Register = () => {
         }
 
         try {
-            const response = await axios.get(`http://localhost:800npm0/api/users/check-duplicate-email?email=${formData.email}`);
+            const response = await axios.get(`http://localhost:8000/api/users/check-duplicate-email?email=${formData.email}`);
             if (response.data.duplicate) {
                 setErrors(prev => ({...prev, email: "이미 사용 중인 이메일입니다."}));
                 setIsEmailAvailable(false);
@@ -132,7 +131,8 @@ const Register = () => {
             setErrors(prev => ({...prev, passwordConfirm: "비밀번호가 일치하지 않습니다."}));
             return;
         }
-
+        const dataToSend = { ...formData };
+        delete dataToSend.passwordConfirm;
         try {
             await axios.post('http://localhost:8000/api/users/regist-user', formData);
             alert("회원가입이 완료되었습니다.");
@@ -158,16 +158,16 @@ const Register = () => {
                                 className="register-input"
                                 type="text"
                                 placeholder="아이디"
-                                value={formData.userId}
+                                value={formData.username}
                                 onChange={(e) => {
-                                    setFormData(prev => ({...prev, userId: e.target.value}));
+                                    setFormData(prev => ({...prev, username: e.target.value}));
                                     setIsIdAvailable(false);
                                 }}
                                 required
                             />
                             <button className="register-button" type="button" onClick={handleIdCheck}>중복확인</button>
                         </div>
-                        {errors.userId && <div className="register-error-message">{errors.userId}</div>}
+                        {errors.username && <div className="register-error-message">{errors.username}</div>}
                         {isIdAvailable && <div className="register-success-message">사용 가능한 아이디입니다.</div>}
                     </div>
 
@@ -175,7 +175,7 @@ const Register = () => {
                         <div className="register-label">비밀번호</div>
                         <input
                             className="register-input"
-                            type="password"
+                            type="text"
                             placeholder="비밀번호"
                             value={formData.password}
                             onChange={(e) => {
@@ -203,7 +203,7 @@ const Register = () => {
                         <div className="register-label">비밀번호 확인</div>
                         <input
                             className="register-input"
-                            type="password"
+                            type="text"
                             placeholder="비밀번호 확인"
                             value={formData.passwordConfirm}
                             onChange={(e) => setFormData(prev => ({...prev, passwordConfirm: e.target.value}))}
@@ -333,5 +333,4 @@ const Register = () => {
         </div>
     );
 };
-
 export default Register; 

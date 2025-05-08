@@ -48,9 +48,10 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_PATHS).permitAll()
-                        .requestMatchers("/api/store/**").hasRole("STORE")
-                        .requestMatchers("/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/**").permitAll() // 모든 API 허용
+                        // .requestMatchers("/api/store/**").hasRole("STORE")
+                        // .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(
                         new JwtAuthenticationFilter(jwtTokenProvider, "provider00"),

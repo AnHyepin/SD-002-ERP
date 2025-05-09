@@ -5,6 +5,7 @@ import com.example.backend.secu.CustomUserDetails;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -48,6 +49,14 @@ public class AuthController {
             ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Invalid username or password");
+        }
+    }
+    @GetMapping("/check-login")
+    public ResponseEntity<?> checkLogin(Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            return ResponseEntity.ok().build(); // 로그인 상태면 200 OK
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 아니면 401
         }
     }
 

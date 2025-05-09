@@ -3,6 +3,7 @@ package com.example.backend.service.hyepin;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,18 +18,13 @@ import com.example.backend.repository.StoreRepository;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class StoreService {
 
     protected static final String REGION_GROUP_CODE = "region_code";
-
-    @Autowired
-    private GubnDao gubnDao;
-
-    @Autowired
-    private StoreDao storeDao;
-
-    @Autowired
-    private StoreRepository storeRepository;
+    private final GubnDao gubnDao;
+    private final StoreDao storeDao;
+    private final StoreRepository storeRepository;
 
     // 매장 코드 생성
     @Transactional(readOnly = true)

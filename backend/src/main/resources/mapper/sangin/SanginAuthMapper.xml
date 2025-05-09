@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.example.backend.dao.SanginAuthDao">
+<mapper namespace="com.example.backend.dao.sangin.SanginAuthDao">
     
     <!-- 로그인 -->
     <select id="login" parameterType="com.example.backend.dto.LoginRequest" resultType="map">
@@ -9,5 +9,12 @@
         WHERE user_id = #{userId}
         AND password = #{password}
     </select>
+
+    <select id="findByUsername" resultType="com.example.backend.dto.UserDto">
+        SELECT *
+        FROM tbl_user
+        WHERE username = #{username}
+    </select>
+
 
 </mapper>

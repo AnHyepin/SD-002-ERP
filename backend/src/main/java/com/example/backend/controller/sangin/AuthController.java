@@ -25,19 +25,24 @@ public class AuthController {
         try {
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                    loginRequest.getUserId(),
+                    loginRequest.getUsername(),
                     loginRequest.getPassword()
                 )
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            
-            String token = jwtTokenProvider.createToken(userDetails.getUserId(), userDetails.getRole());
+
+            String token = jwtTokenProvider.createToken(
+                    userDetails.getUserId(), // userId
+                    userDetails.getUsername(), // ✅ username
+                    userDetails.getRole() // role
+            );
+
             jwtTokenProvider.addTokenToCookie(response, token);
 
             return ResponseEntity.ok(new LoginResponse(
-                userDetails.getUserId(),
+                userDetails.getUsername(),
                 userDetails.getRole(),
                 token
             ));
@@ -54,13 +59,14 @@ public class AuthController {
 
     @Data
     static class LoginRequest {
-        private String userId;
+        private String username;
         private String password;
     }
 
     @Data
     static class LoginResponse {
-        private final String userId;
+        private String userId;
+        private final String username;
         private final String role;
         private final String token;
     }

@@ -9,11 +9,13 @@ import java.util.Collections;
 
 public class CustomUserDetails implements UserDetails {
     private final String userId;
+    private final String username;
     private final String password;
     private final String role; // ✅ 역할 추가
 
-    public CustomUserDetails(String userId, String password, String role) {
+    public CustomUserDetails(String userId, String username, String password, String role) {
         this.userId = userId;
+        this.username = username;
         this.password = password;
         this.role = role;
     }
@@ -30,13 +32,11 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return userId;
+        return username;
     }
-
     public String getUserId() {
         return userId;
     }
-
     public String getRole() {
         return role;
     }

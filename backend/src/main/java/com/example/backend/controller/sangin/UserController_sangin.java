@@ -4,6 +4,7 @@ import com.example.backend.dto.UserDto;
 import com.example.backend.service.sangin.UserService_sangin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +16,9 @@ public class UserController_sangin {
 
     @Autowired
     private UserService_sangin userService;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
 //  사용자 관리
     @GetMapping
@@ -35,6 +39,7 @@ public class UserController_sangin {
 //  중복 체크 ( 회원가입용 )
     @GetMapping("/check-duplicate-username")
     public ResponseEntity<?> checkDuplicateId(@RequestParam String username) {
+        System.out.println(passwordEncoder.encode("1"));
         boolean isDuplicate = userService.checkDuplicateUsername(username);
         return ResponseEntity.ok().body(Map.of("duplicate", isDuplicate));
     }
@@ -53,6 +58,10 @@ public class UserController_sangin {
 //    회원가입
     @PostMapping("/regist-user")
     public ResponseEntity<?> registerUser(@RequestBody UserDto user) {
+
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+
         userService.insertUser(user);
         return ResponseEntity.ok().build();
     }

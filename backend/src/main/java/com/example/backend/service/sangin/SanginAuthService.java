@@ -24,39 +24,4 @@ public class SanginAuthService {
         }
     }
 
-    public ResponseEntity<?> register(RegisterRequest registerRequest) {
-        try {
-            // 회원가입 로직 구현
-            return ResponseEntity.ok(authDao.register(registerRequest));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("회원가입 실패: " + e.getMessage());
-        }
-    }
-
-    public ResponseEntity<?> checkDuplicateId(String userId) {
-        try {
-            boolean isDuplicate = authDao.checkDuplicateId(userId);
-            return ResponseEntity.ok(Map.of("duplicate", isDuplicate));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("중복 확인 실패: " + e.getMessage());
-        }
-    }
-
-    public ResponseEntity<?> checkDuplicateEmail(String email) {
-        try {
-            boolean isDuplicate = authDao.checkDuplicateEmail(email);
-            return ResponseEntity.ok(Map.of("duplicate", isDuplicate));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("중복 확인 실패: " + e.getMessage());
-        }
-    }
-
-    public ResponseEntity<?> checkDuplicatePhone(String phoneNumber) {
-        try {
-            boolean isDuplicate = authDao.checkDuplicatePhone(phoneNumber);
-            return ResponseEntity.ok(Map.of("duplicate", isDuplicate));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("중복 확인 실패: " + e.getMessage());
-        }
-    }
-} 
+}

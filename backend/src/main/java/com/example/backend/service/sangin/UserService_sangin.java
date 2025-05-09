@@ -28,4 +28,17 @@ public class UserService_sangin {
     public void deleteUser(int id) {
         userDao.deleteUser(id);
     }
+
+    public boolean checkDuplicateUsername(String username) {
+        return userDao.countByUsername(username) > 0;
+    }
+
+    public boolean checkDuplicateEmail(String email) {
+        return userDao.countByEmail(email) > 0;
+    }
+
+    public boolean checkDuplicatePhone(String phoneNumber) {
+        return userDao.countByPhoneNumber(phoneNumber) > 0;
+    }
+
 }

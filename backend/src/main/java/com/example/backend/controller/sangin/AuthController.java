@@ -5,6 +5,7 @@ import com.example.backend.secu.CustomUserDetails;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,24 +26,37 @@ public class AuthController {
         try {
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                    loginRequest.getUserId(),
+                    loginRequest.getUsername(),
                     loginRequest.getPassword()
                 )
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            
-            String token = jwtTokenProvider.createToken(userDetails.getUserId(), userDetails.getRole());
+
+            String token = jwtTokenProvider.createToken(
+                    userDetails.getUserId(), // userId
+                    userDetails.getUsername(), // ✅ username
+                    userDetails.getRole() // role
+            );
+
             jwtTokenProvider.addTokenToCookie(response, token);
 
             return ResponseEntity.ok(new LoginResponse(
-                userDetails.getUserId(),
+                userDetails.getUsername(),
                 userDetails.getRole(),
                 token
             ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Invalid username or password");
+        }
+    }
+    @GetMapping("/check-login")
+    public ResponseEntity<?> checkLogin(Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            return ResponseEntity.ok().build(); // 로그인 상태면 200 OK
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 아니면 401
         }
     }
 
@@ -54,13 +68,14 @@ public class AuthController {
 
     @Data
     static class LoginRequest {
-        private String userId;
+        private String username;
         private String password;
     }
 
     @Data
     static class LoginResponse {
-        private final String userId;
+        private String userId;
+        private final String username;
         private final String role;
         private final String token;
     }

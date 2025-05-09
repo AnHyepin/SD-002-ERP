@@ -22,12 +22,13 @@ public class JwtTokenProvider {
     private static final String TOKEN_COOKIE_NAME = "provider00";
 
     // JWT 생성
-    public String createToken(String userId, String role) {
+    public String createToken(String userId, String username, String role) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + expiration);
 
         return Jwts.builder()
                 .setSubject(userId) // user_id 저장
+                .claim("username", username) //
                 .claim("role", role) // 사용자 역할 저장
                 .setIssuedAt(now)//발급기간
                 .setExpiration(validity) // 유효기간
@@ -51,6 +52,12 @@ public class JwtTokenProvider {
         return claims.getSubject(); // ✅ "sub" 값을 반환하도록 수정
     }
 
+    public String getUsernameFromToken(String token) {
+        Claims claims = parseClaims(token);
+        return claims.get("username", String.class);
+    }
+
+
     // ✅ JWT에서 역할(Role) 추출
     public String getRoleFromToken(String token) {
         Claims claims = parseClaims(token);
@@ -68,7 +75,7 @@ public class JwtTokenProvider {
     public void addTokenToCookie(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie(TOKEN_COOKIE_NAME, token);
         cookie.setHttpOnly(true);
-        cookie.setSecure(!isLocalEnvironment());
+        cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge((int) (expiration / 1000));
         response.addCookie(cookie);
@@ -77,7 +84,7 @@ public class JwtTokenProvider {
     public void deleteTokenCookie(HttpServletResponse response) {
         Cookie cookie = new Cookie(TOKEN_COOKIE_NAME, null);
         cookie.setHttpOnly(true);
-        cookie.setSecure(!isLocalEnvironment());
+        cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);

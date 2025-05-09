@@ -11,4 +11,9 @@ public interface UserDao_sangin {
     void insertUser(UserDto user);
     void updateUser(UserDto user);
     void deleteUser(int id);
+    int countByUsername(String username);
+    int countByEmail(String email);
+    int countByPhoneNumber(String phoneNumber);
+
+
 }

@@ -6,14 +6,19 @@ import './Login.css';
 const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    userId: '',
+    username: '',
     password: ''
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(formData);
+
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/login', formData);
+
+      const response = await axios.post('http://localhost:8000/api/auth/login', formData, {
+        withCredentials: true
+      });
       if (response.data) {
         alert('로그인 성공!');
         navigate('/');
@@ -38,8 +43,8 @@ const Login = () => {
             className="login-input"
             type="text"
             placeholder="아이디"
-            value={formData.userId}
-            onChange={(e) => setFormData({ ...formData, userId: e.target.value })}
+            value={formData.username}
+            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
             required
           />
           <input

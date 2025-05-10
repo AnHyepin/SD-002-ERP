@@ -1,13 +1,16 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import HomePage from '../pages/HomePage';
-import UserManagementPage from '../pages/UserManagementPage';
 import Store2 from '../pages/operation/Store2';
 
 // Operation
+import UserManagementPage from '../pages/UserManagementPage';
 import StoreManagementPage from '../pages/operation/StoreManagementPage';
-import MaterialManagementPage from '../pages/operation/MaterialManagementPage';
-import BomManagementPage from '../pages/operation/BomManagementPage';
+
+//Product
+import MaterialManagementPage from '../pages/Product/MaterialManagementPage';
+import BomManagementPage from '../pages/Product/BomManagementPage';
+import ProductManagementPage from "../pages/Product/ProductManagementPage";
 
 // Inventory
 import BranchInventoryPage from '../pages/inventory/BranchInventoryPage';
@@ -30,8 +33,11 @@ const MainRouter = () => {
       {/* Operation Routes */}
       <Route path="/operation/store" element={<StoreManagementPage />} />
       <Route path="/operation/user" element={<UserManagementPage />} />
-      <Route path="/operation/material" element={<MaterialManagementPage />} />
-      <Route path="/operation/bom" element={<BomManagementPage />} />
+
+      {/* Product Routes */}
+      <Route path="/Product/material" element={<MaterialManagementPage />} />
+      <Route path="/Product/bom" element={<BomManagementPage />} />
+      <Route path="/Product/product" element={<ProductManagementPage />} />
 
       {/* Inventory Routes */}
       <Route path="/inventory/branch" element={<BranchInventoryPage />} />

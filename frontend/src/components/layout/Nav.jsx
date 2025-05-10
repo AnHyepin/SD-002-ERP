@@ -11,8 +11,14 @@ const Nav = () => {
       subItems: [
         { name: '매장 관리', path: '/operation/store' },
         { name: '사용자 관리', path: '/operation/user' },
-        { name: '원재료 관리', path: '/operation/material' },
-        { name: '제품(BOM) 관리', path: '/operation/bom' }
+      ]
+    },
+    Product: {
+      title: '제품',
+      subItems: [
+        { name: '원재료 관리', path: '/Product/material' },
+        { name: '레시피(BOM) 관리', path: '/Product/bom' },
+        { name: '완제품 관리', path: '/Product/product' }
       ]
     },
     inventory: {

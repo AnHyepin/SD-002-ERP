@@ -40,9 +40,13 @@ const BomManagementPage3 = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [formData, setFormData] = useState({
         productId: '',
+        productName: '',
         materialId: '',
+        materialName: '',
         quantity: '',
         unit: '',
+        createdAt: '',
+        categoryName: '',
     });
     const [bomItems, setBomItems] = useState([]);
 
@@ -53,11 +57,11 @@ const BomManagementPage3 = () => {
             .catch(err => console.error('제품 조회 실패:', err));
     }, []);
 
-    // 자재 목록 가져오기
+    // 재료 목록 가져오기
     useEffect(() => {
         axios.get('/api/material')
             .then(res => setMaterialList(res.data))
-            .catch(err => console.error('자재 조회 실패:', err));
+            .catch(err => console.error('재료 조회 실패:', err));
     }, []);
 
     // BOM 목록 가져오기
@@ -102,9 +106,13 @@ const BomManagementPage3 = () => {
                     setBomItems(res.data);
                     setFormData({
                         productId: product.productId,
+                        productName: '',
                         materialId: '',
+                        materialName: '',
                         quantity: '',
                         unit: '',
+                        createdAt: '',
+                        categoryName: '',
                     });
                 })
                 .catch(err => console.error('BOM 항목 조회 실패:', err));
@@ -112,9 +120,13 @@ const BomManagementPage3 = () => {
             setBomItems([]);
             setFormData({
                 productId: '',
+                productName: '',
                 materialId: '',
+                materialName: '',
                 quantity: '',
                 unit: '',
+                createdAt: '',
+                categoryName: '',
             });
         }
         setOpen(true);
@@ -138,9 +150,14 @@ const BomManagementPage3 = () => {
         setBomItems([...bomItems, newItem]);
         setFormData({
             ...formData,
+            productId: '',
+            productName: '',
             materialId: '',
+            materialName: '',
             quantity: '',
             unit: '',
+            createdAt: '',
+            categoryName: '',
         });
     };
 
@@ -213,7 +230,7 @@ const BomManagementPage3 = () => {
                             label="검색어"
                             value={searchKeyword}
                             onChange={(e) => setSearchKeyword(e.target.value)}
-                            placeholder="제품명, 자재명, 수량, 단위로 검색"
+                            placeholder="제품명, 재료명, 수량, 단위로 검색"
                             sx={{width: '400px'}}
                         />
                     </Box>
@@ -230,33 +247,56 @@ const BomManagementPage3 = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell>제품명</TableCell>
-                                <TableCell>자재명</TableCell>
+                                <TableCell>재료명</TableCell>
                                 <TableCell>수량</TableCell>
                                 <TableCell>단위</TableCell>
+                                <TableCell>카테고리</TableCell>
                                 <TableCell align="center">관리</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredBomList
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map((bom) => (
-                                    <TableRow key={bom.bomId}>
-                                        <TableCell>{bom.productName}</TableCell>
-                                        <TableCell>{bom.materialName}</TableCell>
-                                        <TableCell>{bom.quantity}</TableCell>
-                                        <TableCell>{bom.unit}</TableCell>
-                                        <TableCell align="center">
-                                            <Button
-                                                variant="outlined"
-                                                size="small"
-                                                onClick={() => handleOpen({productId: bom.productId})}
-                                            >
-                                                수정
-                                            </Button>
+                            {Object.entries(
+                                filteredBomList.reduce((acc, item) => {
+                                    if (!acc[item.productName]) acc[item.productName] = [];
+                                    acc[item.productName].push(item);
+                                    return acc;
+                                }, {})
+                            ).map(([productName, items]) => (
+                                <React.Fragment key={productName}>
+                                    <TableRow>
+                                        <TableCell colSpan={6}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+                                                <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                                                    🥪 {productName}
+                                                </Typography>
+                                                <Button
+                                                    variant="outlined"
+                                                    size="small"
+                                                    onClick={() => handleOpen({ productId: items[0].productId })}
+                                                    sx={{ mr: 3 }}
+                                                >
+                                                    수정
+                                                </Button>
+                                            </Box>
                                         </TableCell>
+
                                     </TableRow>
-                                ))}
+                                    {items.map((bom) => (
+                                        <TableRow key={bom.bomId}>
+                                            <TableCell />
+                                            <TableCell>{bom.materialName}</TableCell>
+                                            <TableCell>{bom.quantity}</TableCell>
+                                            <TableCell>{bom.unit}</TableCell>
+                                            <TableCell>{bom.categoryName}</TableCell>
+                                            <TableCell align="center">
+
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </React.Fragment>
+                            ))}
                         </TableBody>
+
                     </Table>
                     <TablePagination
                         rowsPerPageOptions={[10, 25, 50]}
@@ -294,13 +334,13 @@ const BomManagementPage3 = () => {
                             </FormControl>
 
                             <Box sx={{mt: 2, mb: 2}}>
-                                <Typography variant="h6">자재 구성</Typography>
+                                <Typography variant="h6">구성 재료</Typography>
                                 <Box sx={{display: 'flex', gap: 1, mb: 1}}>
                                     <FormControl sx={{flex: 2}}>
-                                        <InputLabel>자재</InputLabel>
+                                        <InputLabel>재료</InputLabel>
                                         <Select
                                             value={formData.materialId}
-                                            label="자재"
+                                            label="재료"
                                             onChange={(e) => {
                                                 const material = materialList.find(m => m.materialId === e.target.value);
                                                 setFormData({
@@ -340,9 +380,10 @@ const BomManagementPage3 = () => {
                                 <Table size="small">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell>자재명</TableCell>
+                                            <TableCell>재료명</TableCell>
                                             <TableCell>수량</TableCell>
                                             <TableCell>단위</TableCell>
+                                            <TableCell>카테고리</TableCell>
                                             <TableCell align="center">관리</TableCell>
                                         </TableRow>
                                     </TableHead>
@@ -352,6 +393,7 @@ const BomManagementPage3 = () => {
                                                 <TableCell>{item.materialName}</TableCell>
                                                 <TableCell>{item.quantity}</TableCell>
                                                 <TableCell>{item.unit}</TableCell>
+                                                <TableCell>{item.categoryName}</TableCell>
                                                 <TableCell align="center">
                                                     <IconButton
                                                         color="error"

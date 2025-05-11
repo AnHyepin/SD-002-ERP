@@ -14,5 +14,5 @@ public class StoreDto {
     private String location;
     private String contact;
     private String managerName;
-    private LocalDateTime createdAt;
+    private String createdAt;
 }

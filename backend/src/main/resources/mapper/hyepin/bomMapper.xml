@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.dao.hyepin.BomDao">
+
+    <select id="getBomList" resultType="com.example.backend.dto.BomDto">
+        SELECT * FROM vw_bom_with_names
+    </select>
+
+    <select id="findByProductId" resultType="com.example.backend.dto.BomDto">
+        SELECT bom_id, product_id, product_name, material_id, material_name, quantity, unit, created_at, category, category_name
+        FROM vw_bom_with_names
+        WHERE product_id = #{productId}
+    </select>
+
+
+</mapper>

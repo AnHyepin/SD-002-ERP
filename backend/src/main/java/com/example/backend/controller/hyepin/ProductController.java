@@ -1,18 +1,29 @@
 package com.example.backend.controller.hyepin;
 
+import com.example.backend.entity.Product;
+import com.example.backend.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+import java.util.List;
+
+@RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/product")
+@RequestMapping("/api/product")
 public class ProductController {
 
-    //전체 제품 조회
+    private final ProductRepository productRepository;
 
+    //전체 제품 조회
+    @GetMapping
+    public ResponseEntity<List<Product>> getProductList() {
+        return ResponseEntity.ok(productRepository.findAll());
+    }
 
     //제품등록
 

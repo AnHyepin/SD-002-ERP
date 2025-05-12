@@ -35,6 +35,7 @@ const BomManagementPage3 = () => {
     const [filteredBomList, setFilteredBomList] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState('');
     const [searchKeyword, setSearchKeyword] = useState('');
+    const [isEditMode, setIsEditMode] = useState(false);
     const [open, setOpen] = useState(false);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -100,33 +101,40 @@ const BomManagementPage3 = () => {
     // BOM 등록/수정 다이얼로그 열기
     const handleOpen = (product = null) => {
         if (product) {
+            setIsEditMode(true);
             // 제품의 기존 BOM 항목들 가져오기
             axios.get(`/api/bom/product/${product.productId}`)
                 .then(res => {
-                    setBomItems(res.data);
+                    // 기존 BOM 항목들을 상태에 맞게 변환
+                    const formattedItems = res.data.map(item => ({
+                        bomId: item.bomId,
+                        materialId: item.materialId,
+                        materialName: item.materialName,
+                        quantity: item.quantity,
+                        unit: item.unit,
+                        category: item.category,
+                        categoryName: item.categoryName
+                    }));
+                    setBomItems(formattedItems);
                     setFormData({
                         productId: product.productId,
-                        productName: '',
                         materialId: '',
-                        materialName: '',
                         quantity: '',
-                        unit: '',
-                        createdAt: '',
-                        categoryName: '',
+                        unit: ''
                     });
                 })
-                .catch(err => console.error('BOM 항목 조회 실패:', err));
+                .catch(err => {
+                    console.error('BOM 항목 조회 실패:', err);
+                    alert('BOM 항목 조회에 실패했습니다.');
+                });
         } else {
+            setIsEditMode(false);
             setBomItems([]);
             setFormData({
                 productId: '',
-                productName: '',
                 materialId: '',
-                materialName: '',
                 quantity: '',
-                unit: '',
-                createdAt: '',
-                categoryName: '',
+                unit: ''
             });
         }
         setOpen(true);
@@ -139,25 +147,39 @@ const BomManagementPage3 = () => {
             return;
         }
 
-        const material = materialList.find(m => m.materialId === formData.materialId);
-        const newItem = {
-            materialId: formData.materialId,
-            materialName: material.materialName,
-            quantity: formData.quantity,
-            unit: formData.unit,
-        };
+        const material = materialList.find(m => m.materialId == formData.materialId);
+        const quantityToAdd = parseFloat(formData.quantity);
+        const materialId = parseInt(formData.materialId);
 
-        setBomItems([...bomItems, newItem]);
+        const existingIndex = bomItems.findIndex(item => item.materialId === materialId);
+
+        if (existingIndex !== -1) {
+            // 기존에 있는 항목 → 수량만 누적
+            const updatedItems = [...bomItems];
+            updatedItems[existingIndex] = {
+                ...updatedItems[existingIndex],
+                quantity: parseFloat(updatedItems[existingIndex].quantity) + quantityToAdd
+            };
+            setBomItems(updatedItems);
+        } else {
+            // 새 항목 추가
+            const newItem = {
+                materialId: materialId,
+                materialName: material.materialName,
+                quantity: quantityToAdd,
+                unit: formData.unit,
+                category: material.category,
+                categoryName: material.categoryName
+            };
+            setBomItems([...bomItems, newItem]);
+        }
+
+        // 입력 초기화
         setFormData({
             ...formData,
-            productId: '',
-            productName: '',
             materialId: '',
-            materialName: '',
             quantity: '',
-            unit: '',
-            createdAt: '',
-            categoryName: '',
+            unit: ''
         });
     };
 
@@ -167,6 +189,7 @@ const BomManagementPage3 = () => {
         setBomItems(newItems);
     };
 
+
     // BOM 저장
     const handleSave = async () => {
         if (!formData.productId || bomItems.length === 0) {
@@ -175,32 +198,40 @@ const BomManagementPage3 = () => {
         }
 
         try {
-            // 기존 BOM 삭제 후 새로운 BOM 저장
-            await axios.delete(`/api/bom/product/${formData.productId}`);
-            await axios.post('/api/bom', {
-                productId: formData.productId,
-                items: bomItems
-            });
+            if (isEditMode) {
+                // 기존 BOM 삭제
+                await axios.delete(`/api/bom/product/${formData.productId}`);
+            }
+
+            // 각 BOM 항목을 개별적으로 저장
+            for (const item of bomItems) {
+                const bomData = {
+                    productId: formData.productId,
+                    materialId: item.materialId,
+                    quantity: item.quantity,
+                    unit: item.unit,
+                    createdAt: new Date()
+                };
+                //BOM 등록, 수정
+                await axios.post('/api/bom', bomData);
+            }
 
             // 목록 새로고침
             const res = await axios.get('/api/bom');
             setBomList(res.data);
             setOpen(false);
+            setIsEditMode(false);
+            setBomItems([]);
+            setFormData({
+                productId: '',
+                materialId: '',
+                quantity: '',
+                unit: ''
+            });
         } catch (error) {
             alert('저장에 실패했습니다.');
             console.error('BOM 저장 실패:', error);
         }
-    };
-
-    // 페이지 변경 핸들러
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    // 페이지당 행 수 변경 핸들러
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
     };
 
     return (
@@ -265,57 +296,47 @@ const BomManagementPage3 = () => {
                                 <React.Fragment key={productName}>
                                     <TableRow>
                                         <TableCell colSpan={6}>
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-                                                <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                                            <Box sx={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                mt: 2
+                                            }}>
+                                                <Typography variant="subtitle1" sx={{fontWeight: 'bold'}}>
                                                     🥪 {productName}
                                                 </Typography>
                                                 <Button
                                                     variant="outlined"
                                                     size="small"
-                                                    onClick={() => handleOpen({ productId: items[0].productId })}
-                                                    sx={{ mr: 3 }}
+                                                    onClick={() => handleOpen({productId: items[0].productId})}
+                                                    sx={{mr: 3}}
                                                 >
                                                     수정
                                                 </Button>
                                             </Box>
                                         </TableCell>
-
                                     </TableRow>
                                     {items.map((bom) => (
                                         <TableRow key={bom.bomId}>
-                                            <TableCell />
+                                            <TableCell/>
                                             <TableCell>{bom.materialName}</TableCell>
                                             <TableCell>{bom.quantity}</TableCell>
                                             <TableCell>{bom.unit}</TableCell>
                                             <TableCell>{bom.categoryName}</TableCell>
                                             <TableCell align="center">
-
                                             </TableCell>
                                         </TableRow>
                                     ))}
                                 </React.Fragment>
                             ))}
                         </TableBody>
-
                     </Table>
-                    <TablePagination
-                        rowsPerPageOptions={[10, 25, 50]}
-                        component="div"
-                        count={filteredBomList.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                        labelRowsPerPage="페이지당 행 수"
-                        labelDisplayedRows={({ from, to, count }) =>
-                            `${Math.floor(from / rowsPerPage) + 1}페이지 (총 ${Math.ceil(count / rowsPerPage)}페이지)`
-                        }
-                    />
+
                 </TableContainer>
 
                 {/* 등록/수정 다이얼로그 */}
                 <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth>
-                    <DialogTitle>레시피 {formData.productId ? '수정' : '등록'}</DialogTitle>
+                    <DialogTitle>레시피 {isEditMode ? '수정' : '등록'}</DialogTitle>
                     <DialogContent>
                         <Box sx={{mt: 2}}>
                             <FormControl fullWidth margin="normal">
@@ -325,11 +346,19 @@ const BomManagementPage3 = () => {
                                     label="제품"
                                     onChange={(e) => setFormData({...formData, productId: e.target.value})}
                                 >
-                                    {productList.map(product => (
-                                        <MenuItem key={product.productId} value={product.productId}>
-                                            {product.productName}
-                                        </MenuItem>
-                                    ))}
+                                    {productList.map(product => {
+                                        const isAlreadyRegistered = bomList.some(b => b.productId === product.productId);
+                                        return (
+                                            <MenuItem
+                                                key={product.productId}
+                                                value={product.productId}
+                                                disabled={isAlreadyRegistered}
+                                                sx={isAlreadyRegistered ? {color: 'gray'} : {}}
+                                            >
+                                                {product.productName} {isAlreadyRegistered ? '(등록됨)' : ''}
+                                            </MenuItem>
+                                        );
+                                    })}
                                 </Select>
                             </FormControl>
 
@@ -371,7 +400,7 @@ const BomManagementPage3 = () => {
                                         sx={{flex: 1}}
                                     />
                                     <IconButton color="primary" onClick={handleAddBomItem}>
-                                        <AddIcon />
+                                        <AddIcon/>
                                     </IconButton>
                                 </Box>
                             </Box>
@@ -400,7 +429,7 @@ const BomManagementPage3 = () => {
                                                         size="small"
                                                         onClick={() => handleRemoveBomItem(index)}
                                                     >
-                                                        <DeleteIcon />
+                                                        <DeleteIcon/>
                                                     </IconButton>
                                                 </TableCell>
                                             </TableRow>

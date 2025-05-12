@@ -34,40 +34,29 @@ public class BomController {
         List<BomDto> bomList = bomDao.findByProductId(productId);
         return ResponseEntity.ok(bomList);
     }
-//
-//    //레시피 등록
-//    @PostMapping
-//    public ResponseEntity<Bom> createBom(@RequestBody Bom bom) {
-//        Bom savedBom = bomRepository.save(bom);
-//        return ResponseEntity.ok(savedBom);
-//    }
-//
-//    //레시피 수정
-//    @PutMapping("/{bomId}")
-//    public ResponseEntity<Bom> updateBom(@PathVariable Long bomId, @RequestBody Bom bom) {
-//        if (!bomRepository.existsById(bomId)) {
-//            return ResponseEntity.notFound().build();
-//        }
-//        bom.setBomId(bomId);
-//        Bom updatedBom = bomRepository.save(bom);
-//        return ResponseEntity.ok(updatedBom);
-//    }
-//
-//    //레시피 삭제
-//    @DeleteMapping("/{bomId}")
-//    public ResponseEntity<Void> deleteBom(@PathVariable Long bomId) {
-//        if (!bomRepository.existsById(bomId)) {
-//            return ResponseEntity.notFound().build();
-//        }
-//        bomRepository.deleteById(bomId);
-//        return ResponseEntity.ok().build();
-//    }
-//
-//    //제품별 레시피 삭제
-//    @DeleteMapping("/product/{productId}")
-//    public ResponseEntity<Void> deleteBomByProduct(@PathVariable Long productId) {
-//        List<Bom> bomList = bomRepository.findByProductId(productId);
-//        bomRepository.deleteAll(bomList);
-//        return ResponseEntity.ok().build();
-//    }
+
+    //레시피 등록
+    @PostMapping
+    public ResponseEntity<Bom> createBom(@RequestBody Bom bom) {
+        Bom savedBom = bomRepository.save(bom);
+        return ResponseEntity.ok(savedBom);
+    }
+
+    //레시피 삭제
+    @DeleteMapping("/{bomId}")
+    public ResponseEntity<Void> deleteBom(@PathVariable Long bomId) {
+        if (!bomRepository.existsById(bomId)) {
+            return ResponseEntity.notFound().build();
+        }
+        bomRepository.deleteById(bomId);
+        return ResponseEntity.ok().build();
+    }
+
+    //제품별 레시피 삭제
+    @DeleteMapping("/product/{productId}")
+    public ResponseEntity<Void> deleteBomByProduct(@PathVariable Long productId) {
+        List<Bom> bomList = bomRepository.findByProductId(productId);
+        bomRepository.deleteAll(bomList);
+        return ResponseEntity.ok().build();
+    }
 }

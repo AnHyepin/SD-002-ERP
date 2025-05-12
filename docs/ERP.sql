@@ -1,5 +1,5 @@
 -- --------------------------------------------------------
--- 호스트:                          127.0.0.1
+-- 호스트:                          10.0.0.1
 -- 서버 버전:                        8.0.41 - MySQL Community Server - GPL
 -- 서버 OS:                        Win64
 -- HeidiSQL 버전:                  12.10.0.7000
@@ -20,10 +20,10 @@ CREATE TABLE IF NOT EXISTS `tbl_bom` (
   `product_id` bigint NOT NULL COMMENT '완성품 ID',
   `material_id` bigint NOT NULL COMMENT '자재 ID',
   `quantity` double NOT NULL COMMENT '자재 소요량',
-  `unit` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '단위',
+  `unit` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
   PRIMARY KEY (`bom_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='제품별 자재 구성';
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='제품별 자재 구성';
 
 -- 테이블 데이터 erp.tbl_bom:~31 rows (대략적) 내보내기
 INSERT INTO `tbl_bom` (`bom_id`, `product_id`, `material_id`, `quantity`, `unit`, `created_at`) VALUES
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS `tbl_gubn` (
   PRIMARY KEY (`group_code`,`gubn_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='공통 코드 관리';
 
--- 테이블 데이터 erp.tbl_gubn:~26 rows (대략적) 내보내기
+-- 테이블 데이터 erp.tbl_gubn:~38 rows (대략적) 내보내기
 INSERT INTO `tbl_gubn` (`group_code`, `gubn_code`, `gubn_name`) VALUES
 	('material_category', 'B', '빵'),
 	('material_category', 'D', '유제품'),
@@ -111,6 +111,11 @@ INSERT INTO `tbl_gubn` (`group_code`, `gubn_code`, `gubn_name`) VALUES
 	('supply_status', 'R', '요청'),
 	('supply_status', 'S', '출고중'),
 	('supply_status', 'X', '취소'),
+	('unit_code', 'g', 'g'),
+	('unit_code', 'ml', 'ml'),
+	('unit_code', '개', '개'),
+	('unit_code', '장', '장'),
+	('unit_code', '줄', '줄'),
 	('work_status', 'C', '완료'),
 	('work_status', 'O', '지시'),
 	('work_status', 'P', '진행'),
@@ -136,11 +141,11 @@ CREATE TABLE IF NOT EXISTS `tbl_material` (
   `unit` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '단위 (g, 장, 개 등)',
   `unit_price` int NOT NULL DEFAULT '0' COMMENT '단가 (원 단위)',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '등록 일자',
-  `category` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '자재 분류 (야채, 소스 등)',
+  `category` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '자재 분류 (야채, 소스 등)',
   PRIMARY KEY (`material_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='자재 정보';
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='자재 정보';
 
--- 테이블 데이터 erp.tbl_material:~0 rows (대략적) 내보내기
+-- 테이블 데이터 erp.tbl_material:~15 rows (대략적) 내보내기
 INSERT INTO `tbl_material` (`material_id`, `material_name`, `unit`, `unit_price`, `created_at`, `category`) VALUES
 	(1, '식빵', '장', 100, '2025-05-07 05:36:06', 'B'),
 	(2, '양상추', 'g', 10, '2025-05-07 05:36:06', 'V'),
@@ -165,16 +170,18 @@ CREATE TABLE IF NOT EXISTS `tbl_product` (
   `product_desc` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '설명 또는 레시피 정보',
   `price` int NOT NULL DEFAULT '0' COMMENT '판매 단가 (원 단위)',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '등록 일자',
+  `image` varchar(200) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`product_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='샌드위치 제품 정보';
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='샌드위치 제품 정보';
 
--- 테이블 데이터 erp.tbl_product:~0 rows (대략적) 내보내기
-INSERT INTO `tbl_product` (`product_id`, `product_name`, `product_desc`, `price`, `created_at`) VALUES
-	(1, 'SD 샌드위치', '햄, 계란, 치즈, 양상추, 사과, 양파, 수제소스가 조화된 시그니처 샌드위치', 3500, '2025-05-07 05:36:35'),
-	(2, '베이컨 샌드위치', '베이컨, 계란, 치즈, 양상추, 사과, 양파, 수제소스가 어우러진 풍미', 3700, '2025-05-07 05:36:35'),
-	(3, '치킨 샌드위치', '치킨가슴살, 양상추, 양파, 스위트칠리소스로 건강하게', 4300, '2025-05-07 05:36:35'),
-	(4, '떡갈비 샌드위치', '떡갈비패티에 바베큐소스로 진한 맛을 낸 샌드위치', 3900, '2025-05-07 05:36:35'),
-	(5, '치즈&베리 샌드위치', '크림치즈와 딸기잼의 달콤한 조화, 디저트 샌드위치', 3800, '2025-05-07 05:36:35');
+-- 테이블 데이터 erp.tbl_product:~6 rows (대략적) 내보내기
+INSERT INTO `tbl_product` (`product_id`, `product_name`, `product_desc`, `price`, `created_at`, `image`) VALUES
+	(1, 'SD 샌드위치', '햄, 계란, 치즈, 양상추, 사과, 양파, 수제소스가 조화된 시그니처 샌드위치', 3500, '2025-05-07 05:36:35', NULL),
+	(2, '베이컨 샌드위치', '베이컨, 계란, 치즈, 양상추, 사과, 양파, 수제소스가 어우러진 풍미', 3700, '2025-05-07 05:36:35', NULL),
+	(3, '치킨 샌드위치', '치킨가슴살, 양상추, 양파, 스위트칠리소스로 건강하게', 4300, '2025-05-07 05:36:35', NULL),
+	(4, '떡갈비 샌드위치', '떡갈비패티에 바베큐소스로 진한 맛을 낸 샌드위치', 3900, '2025-05-07 05:36:35', NULL),
+	(5, '치즈&베리 샌드위치', '크림치즈와 딸기잼의 달콤한 조화, 디저트 샌드위치', 3800, '2025-05-07 05:36:35', NULL),
+	(6, '뉴욕치즈샌드위치', '뉴욕에서 인기있는 치즈샌드위치', 4800, '2025-05-12 10:40:08', NULL);
 
 -- 테이블 erp.tbl_sales 구조 내보내기
 CREATE TABLE IF NOT EXISTS `tbl_sales` (
@@ -274,13 +281,24 @@ CREATE TABLE IF NOT EXISTS `tbl_user` (
   `user_id` bigint NOT NULL AUTO_INCREMENT COMMENT '사용자 ID',
   `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '로그인 ID',
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '암호화된 비밀번호',
-  `role` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'store' COMMENT '권한 (admin, store)',
+  `role` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'ROLE_STORE' COMMENT '권한 (admin, store)',
   `store_id` bigint DEFAULT NULL COMMENT '소속 매장 ID (본사일 경우 NULL)',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '이름',
+  `gender` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '성별',
+  `birth_year` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '생년',
+  `birth_month` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '생월',
+  `birth_day` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '생일',
+  `phone_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '휴대전화',
+  `agree_terms` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '이용약관 동의 여부',
+  `email` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='사용자 계정, 권한, 매장 연결';
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='사용자 계정, 권한, 매장 연결';
 
--- 테이블 데이터 erp.tbl_user:~0 rows (대략적) 내보내기
+-- 테이블 데이터 erp.tbl_user:~2 rows (대략적) 내보내기
+INSERT INTO `tbl_user` (`user_id`, `username`, `password`, `role`, `store_id`, `created_at`, `name`, `gender`, `birth_year`, `birth_month`, `birth_day`, `phone_number`, `agree_terms`, `email`) VALUES
+	(1, '1', '$2a$10$Sp7ctrmiaAzxotW98wE0T.dXhr385mFTS..CJI08YziB2lmT3ZA.a', 'ROLE_STORE', NULL, '2025-05-08 15:37:44', '한상인', 'M', '2025', '4', '3', '01012345678', 'true', 'h123@naver.com'),
+	(3, '2', '$2a$10$Sp7ctrmiaAzxotW98wE0T.dXhr385mFTS..CJI08YziB2lmT3ZA.a', 'ROLE_STORE', NULL, '2025-05-09 20:11:29', '한상인', 'F', '2007', '10', '20', '01012345671', 'true', 'hansam8456@naver.com');
 
 -- 테이블 erp.tbl_work_order 구조 내보내기
 CREATE TABLE IF NOT EXISTS `tbl_work_order` (
@@ -293,6 +311,43 @@ CREATE TABLE IF NOT EXISTS `tbl_work_order` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='생산지시 정보';
 
 -- 테이블 데이터 erp.tbl_work_order:~0 rows (대략적) 내보내기
+
+-- 뷰 erp.vw_bom_with_names 구조 내보내기
+-- VIEW 종속성 오류를 극복하기 위해 임시 테이블을 생성합니다.
+CREATE TABLE `vw_bom_with_names` (
+	`bom_id` BIGINT NOT NULL COMMENT 'BOM 항목 ID',
+	`product_id` BIGINT NOT NULL COMMENT '완성품 ID',
+	`product_name` VARCHAR(1) NOT NULL COMMENT '샌드위치 이름' COLLATE 'utf8mb4_general_ci',
+	`material_id` BIGINT NOT NULL COMMENT '자재 ID',
+	`material_name` VARCHAR(1) NOT NULL COMMENT '자재명' COLLATE 'utf8mb4_general_ci',
+	`quantity` DOUBLE NOT NULL COMMENT '자재 소요량',
+	`unit` VARCHAR(1) NULL COLLATE 'utf8mb4_general_ci',
+	`created_at` DATETIME NULL COMMENT '생성일시',
+	`category` VARCHAR(1) NULL COMMENT '자재 분류 (야채, 소스 등)' COLLATE 'utf8mb4_general_ci',
+	`category_name` VARCHAR(1) NOT NULL COMMENT '코드 이름' COLLATE 'utf8mb4_general_ci'
+) ENGINE=MyISAM;
+
+-- 뷰 erp.vw_material_with_category 구조 내보내기
+-- VIEW 종속성 오류를 극복하기 위해 임시 테이블을 생성합니다.
+CREATE TABLE `vw_material_with_category` (
+	`material_id` BIGINT NOT NULL COMMENT '자재 ID',
+	`material_name` VARCHAR(1) NOT NULL COMMENT '자재명' COLLATE 'utf8mb4_general_ci',
+	`unit` VARCHAR(1) NOT NULL COMMENT '단위 (g, 장, 개 등)' COLLATE 'utf8mb4_general_ci',
+	`unit_price` INT NOT NULL COMMENT '단가 (원 단위)',
+	`created_at` DATETIME NULL COMMENT '등록 일자',
+	`category` VARCHAR(1) NULL COMMENT '자재 분류 (야채, 소스 등)' COLLATE 'utf8mb4_general_ci',
+	`category_name` VARCHAR(1) NOT NULL COMMENT '코드 이름' COLLATE 'utf8mb4_general_ci'
+) ENGINE=MyISAM;
+
+-- 임시 테이블을 제거하고 최종 VIEW 구조를 생성
+DROP TABLE IF EXISTS `vw_bom_with_names`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vw_bom_with_names` AS select `b`.`bom_id` AS `bom_id`,`b`.`product_id` AS `product_id`,`p`.`product_name` AS `product_name`,`b`.`material_id` AS `material_id`,`m`.`material_name` AS `material_name`,`b`.`quantity` AS `quantity`,`b`.`unit` AS `unit`,`b`.`created_at` AS `created_at`,`m`.`category` AS `category`,`g`.`gubn_name` AS `category_name` from (((`tbl_bom` `b` join `tbl_product` `p` on((`b`.`product_id` = `p`.`product_id`))) join `tbl_material` `m` on((`b`.`material_id` = `m`.`material_id`))) join `tbl_gubn` `g` on((`m`.`category` = `g`.`gubn_code`))) where (`g`.`group_code` = 'material_category')
+;
+
+-- 임시 테이블을 제거하고 최종 VIEW 구조를 생성
+DROP TABLE IF EXISTS `vw_material_with_category`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vw_material_with_category` AS select `m`.`material_id` AS `material_id`,`m`.`material_name` AS `material_name`,`m`.`unit` AS `unit`,`m`.`unit_price` AS `unit_price`,`m`.`created_at` AS `created_at`,`m`.`category` AS `category`,`g`.`gubn_name` AS `category_name` from (`tbl_material` `m` join `tbl_gubn` `g` on((`m`.`category` = `g`.`gubn_code`))) where (`g`.`group_code` = 'material_category')
+;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

@@ -12,14 +12,13 @@
         UPDATE tbl_user
         SET username = #{username},
             email = #{email},
-            department = #{department},
             role = #{role},
             is_active = #{isActive}
-        WHERE id = #{id}
+        WHERE user_id = #{userId}
     </update>
 
     <delete id="deleteUser" parameterType="int">
-        DELETE FROM tbl_user WHERE id = #{id}
+        DELETE FROM tbl_user WHERE user_id = #{userId}
     </delete>
 
     <select id="countByUsername" parameterType="string" resultType="int">

@@ -39,7 +39,6 @@ public class UserController_sangin {
 //  중복 체크 ( 회원가입용 )
     @GetMapping("/check-duplicate-username")
     public ResponseEntity<?> checkDuplicateId(@RequestParam String username) {
-        System.out.println(passwordEncoder.encode("1"));
         boolean isDuplicate = userService.checkDuplicateUsername(username);
         return ResponseEntity.ok().body(Map.of("duplicate", isDuplicate));
     }

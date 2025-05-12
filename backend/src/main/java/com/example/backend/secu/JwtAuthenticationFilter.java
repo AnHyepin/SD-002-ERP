@@ -38,8 +38,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // ✅ CustomUserDetails 생성 (role 포함)
                 CustomUserDetails userDetails = new CustomUserDetails(userId,  username,null, role);
 
-                System.out.println(userDetails.getUserId() + userDetails.getRole() + userDetails.getUsername());
-
                 // ✅ Spring Security에 Authentication 객체 생성
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

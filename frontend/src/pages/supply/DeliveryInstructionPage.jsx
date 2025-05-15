@@ -10,112 +10,113 @@ import {
   TableRow,
   Paper,
   Button,
-  Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
+  Chip
 } from '@mui/material';
 import axios from 'axios';
 
 const statusMap = {
-  'A': { label: '승인', color: 'success' },
-  'S': { label: '출고중', color: 'warning' },
-  'D': { label: '출고완료', color: 'default' },
+  R: { label: '요청', color: 'info' },
+  A: { label: '승인', color: 'success' },
+  S: { label: '출고중', color: 'warning' },
+  D: { label: '출고완료', color: 'default' },
+  X: { label: '취소', color: 'error' }
 };
 
-const DeliveryInstructionPage = () => {
-  const [orders, setOrders] = useState([]);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [shipmentDetails, setShipmentDetails] = useState({});
+const SupplyRequestPage = () => {
+  const [requests, setRequests] = useState([]);
 
   useEffect(() => {
-    fetchOrders();
+    fetchRequests();
   }, []);
 
-  const fetchOrders = async () => {
+  const fetchRequests = async () => {
     try {
-      const response = await axios.get('/api/supply/orders');
-      setOrders(response.data);
+      const response = await axios.get('/api/supply/requests');
+      setRequests(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
-      console.error('출고 지시 데이터 로드 실패:', error);
+      console.error('공급 요청 데이터 로드 실패:', error);
+      setRequests([]); // fallback
     }
   };
 
-  const handleShipmentClick = (order) => {
-    setSelectedOrder(order);
-    // 각 자재별 출고 수량을 초기화
-    const details = {};
-    order.items.forEach(item => {
-      details[item.materialId] = item.quantity;
-    });
-    setShipmentDetails(details);
-    setOpenDialog(true);
-  };
-
-  const handleShipmentSubmit = async () => {
+  const handleStatusChange = async (requestId, newStatus) => {
     try {
-      await axios.post(`/api/supply/orders/${selectedOrder.orderId}/shipment`, {
-        items: Object.entries(shipmentDetails).map(([materialId, quantity]) => ({
-          materialId: Number(materialId),
-          quantity: Number(quantity)
-        }))
+      await axios.put(`/api/supply/requests/${requestId}/status`, {
+        status: newStatus
       });
-      setOpenDialog(false);
-      fetchOrders();
+      fetchRequests();
     } catch (error) {
-      console.error('출고 처리 실패:', error);
+      console.error('상태 변경 실패:', error);
     }
   };
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" sx={{ mb: 3 }}>출고 지시 관리</Typography>
+      <Typography variant="h4" sx={{ mb: 3 }}>
+        공급 요청 관리
+      </Typography>
 
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>지시 ID</TableCell>
               <TableCell>요청 ID</TableCell>
               <TableCell>매장</TableCell>
-              <TableCell>승인일시</TableCell>
+              <TableCell>요청일시</TableCell>
               <TableCell>상태</TableCell>
               <TableCell>자재 목록</TableCell>
               <TableCell>작업</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.map((order) => (
-              <TableRow key={order.orderId}>
-                <TableCell>{order.orderId}</TableCell>
-                <TableCell>{order.requestId}</TableCell>
-                <TableCell>{order.storeName}</TableCell>
-                <TableCell>{order.approvedAt}</TableCell>
+            {requests.map((request) => (
+              <TableRow key={request.requestId}>
+                <TableCell>{request.requestId}</TableCell>
+                <TableCell>{request.storeName}</TableCell>
+                <TableCell>{request.requestedAt}</TableCell>
                 <TableCell>
                   <Chip
-                    label={statusMap[order.status]?.label}
-                    color={statusMap[order.status]?.color}
+                    label={statusMap[request.status]?.label || request.status}
+                    color={statusMap[request.status]?.color || 'default'}
                     size="small"
                   />
                 </TableCell>
                 <TableCell>
-                  {order.items.map((item, index) => (
+                  {(request.items ?? []).map((item, index) => (
                     <div key={index}>
                       {item.materialName}: {item.quantity} {item.unit}
                     </div>
                   ))}
                 </TableCell>
                 <TableCell>
-                  {order.status === 'S' && (
+                  {request.status === 'R' && (
+                    <>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="success"
+                        onClick={() => handleStatusChange(request.requestId, 'A')}
+                        sx={{ mr: 1 }}
+                      >
+                        승인
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="error"
+                        onClick={() => handleStatusChange(request.requestId, 'X')}
+                      >
+                        취소
+                      </Button>
+                    </>
+                  )}
+                  {request.status === 'A' && (
                     <Button
                       size="small"
                       variant="contained"
-                      onClick={() => handleShipmentClick(order)}
+                      onClick={() => handleStatusChange(request.requestId, 'S')}
                     >
-                      출고 처리
+                      출고 시작
                     </Button>
                   )}
                 </TableCell>
@@ -124,40 +125,8 @@ const DeliveryInstructionPage = () => {
           </TableBody>
         </Table>
       </TableContainer>
-
-      {/* 출고 처리 다이얼로그 */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>출고 처리</DialogTitle>
-        <DialogContent>
-          <Box sx={{ pt: 2 }}>
-            {selectedOrder?.items.map((item) => (
-              <Box key={item.materialId} sx={{ mb: 2 }}>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  {item.materialName} (요청: {item.quantity} {item.unit})
-                </Typography>
-                <TextField
-                  label="출고 수량"
-                  type="number"
-                  fullWidth
-                  value={shipmentDetails[item.materialId] || ''}
-                  onChange={(e) => setShipmentDetails({
-                    ...shipmentDetails,
-                    [item.materialId]: e.target.value
-                  })}
-                />
-              </Box>
-            ))}
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>취소</Button>
-          <Button onClick={handleShipmentSubmit} variant="contained">
-            출고 처리
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };
 
-export default DeliveryInstructionPage; 
+export default SupplyRequestPage;

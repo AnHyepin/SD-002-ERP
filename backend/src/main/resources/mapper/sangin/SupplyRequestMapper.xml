@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.dao.sangin.SupplyRequestDao">
+
+    <!-- 요청서 목록 -->
+    <select id="findAllRequests" resultType="com.example.backend.dto.SupplyRequestDto">
+        SELECT
+        r.request_id,
+        r.store_id,
+        s.store_name,  -- optional
+        r.status,
+        r.requested_at
+        FROM tbl_supply_request r
+        LEFT JOIN tbl_store s ON r.store_id = s.store_id
+        ORDER BY r.requested_at DESC
+    </select>
+
+    <!-- 요청 항목 목록 (개별 요청서용) -->
+    <select id="findItemsByRequestId" resultType="com.example.backend.dto.SupplyRequestItemDto">
+        SELECT
+        i.material_id,
+        m.material_name,
+        i.quantity,
+        m.unit
+        FROM tbl_supply_item i
+        JOIN tbl_material m ON i.material_id = m.material_id
+        WHERE i.request_id = #{requestId}
+    </select>
+
+    <!-- 요청서 insert → 자동으로 dto.requestId에 키 세팅됨 -->
+    <insert id="insertRequest"
+            parameterType="com.example.backend.dto.SupplyRequestCreateDto"
+            useGeneratedKeys="true"
+            keyProperty="requestId">
+        INSERT INTO tbl_supply_request (store_id, status, requested_at)
+        VALUES (#{storeId}, 'R', NOW())
+    </insert>
+
+    <!-- 요청 항목 insert -->
+    <insert id="insertRequestItem">
+        INSERT INTO tbl_supply_item (request_id, material_id, quantity)
+        VALUES (#{requestId}, #{dto.materialId}, #{dto.quantity})
+    </insert>
+
+    <update id="updateRequestStatus">
+        UPDATE tbl_supply_request
+        SET status = #{status}
+        WHERE request_id = #{requestId}
+    </update>
+
+</mapper>

@@ -32,11 +32,12 @@ const StoreInventoryPage = () => {
   const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [requestQuantity, setRequestQuantity] = useState('');
 
+  const storeId = 2; // 예시: 실제로는 localStorage.getItem('storeId') 또는 props 등에서 가져와야 함 수정수정
+
   useEffect(() => {
-    // 재고 데이터 로드
     const fetchInventory = async () => {
       try {
-        const response = await axios.get('/api/inventory/store');
+        const response = await axios.get(`/api/inventory/store?storeId=${storeId}`);
         setInventory(response.data);
         setFilteredInventory(response.data);
       } catch (error) {
@@ -44,19 +45,9 @@ const StoreInventoryPage = () => {
       }
     };
 
-    // 카테고리 데이터 로드
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get('/api/materials/categories');
-        setCategories(response.data);
-      } catch (error) {
-        console.error('카테고리 데이터 로드 실패:', error);
-      }
-    };
-
     fetchInventory();
-    fetchCategories();
-  }, []);
+  }, [storeId]);
+
 
   // 검색어와 카테고리 필터 적용
   useEffect(() => {
@@ -76,6 +67,7 @@ const StoreInventoryPage = () => {
   const handleRequestSubmit = async () => {
     try {
       await axios.post('/api/supply/request', {
+        storeId,
         materialId: selectedMaterial.materialId,
         quantity: Number(requestQuantity),
       });

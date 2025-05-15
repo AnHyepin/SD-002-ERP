@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.backend.dao.sangin.InventoryDao">
+    <select id="findByStoreId" resultType="com.example.backend.dto.InventoryDto">
+        SELECT i.inventory_id,
+               i.store_id,
+               m.material_id,
+               m.material_name,
+               m.category  AS category_code,
+               g.gubn_name AS category_name,
+               i.quantity,
+               m.unit,
+               i.expired_at,
+               i.created_at
+        FROM tbl_inventory i
+                 JOIN tbl_material m ON i.material_id = m.material_id
+                 LEFT JOIN tbl_gubn g ON m.category = g.gubn_code AND g.group_code = 'material_category'
+        WHERE i.store_id = #{storeId}
+    </select>
+
+</mapper>
+

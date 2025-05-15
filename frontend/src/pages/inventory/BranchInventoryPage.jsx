@@ -14,21 +14,25 @@ import {
   InputLabel,
   Box,
   Typography,
+  Button,
 } from '@mui/material';
 import axios from 'axios';
 
-const BranchInventoryPage = () => {
+const StoreInventoryPage = () => {
   const [inventory, setInventory] = useState([]);
   const [filteredInventory, setFilteredInventory] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [categories, setCategories] = useState([]);
+  const [selectedMaterial, setSelectedMaterial] = useState(null);
+  const [requestQuantity, setRequestQuantity] = useState('');
+
+  const storeId = 1;
 
   useEffect(() => {
-    // 재고 데이터 로드
     const fetchInventory = async () => {
       try {
-        const response = await axios.get('/api/inventory/branch');
+        const response = await axios.get(`/api/inventory/store?storeId=${storeId}`);
         setInventory(response.data);
         setFilteredInventory(response.data);
       } catch (error) {
@@ -36,19 +40,9 @@ const BranchInventoryPage = () => {
       }
     };
 
-    // 카테고리 데이터 로드
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get('/api/materials/categories');
-        setCategories(response.data);
-      } catch (error) {
-        console.error('카테고리 데이터 로드 실패:', error);
-      }
-    };
-
     fetchInventory();
-    fetchCategories();
-  }, []);
+  }, [storeId]);
+
 
   // 검색어와 카테고리 필터 적용
   useEffect(() => {
@@ -101,6 +95,7 @@ const BranchInventoryPage = () => {
               <TableCell>단위</TableCell>
               <TableCell>유통기한</TableCell>
               <TableCell>최근 입고일</TableCell>
+              <TableCell>작업</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -113,13 +108,15 @@ const BranchInventoryPage = () => {
                 <TableCell>{item.unit}</TableCell>
                 <TableCell>{item.expiredAt}</TableCell>
                 <TableCell>{item.createdAt}</TableCell>
+
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+
     </Box>
   );
 };
 
-export default BranchInventoryPage; 
+export default StoreInventoryPage; 

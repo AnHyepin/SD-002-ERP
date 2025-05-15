@@ -30,11 +30,13 @@ public class ProductController {
         return ResponseEntity.ok(productRepository.findAll());
     }
 
+    //제품 한개 조회
     @GetMapping("/{id}")
     public ResponseEntity<ProductDto> getProduct(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getProduct(id));
     }
 
+    //제품 등록
     @PostMapping
     public ResponseEntity<ProductDto> createProduct(
             @RequestParam("productName") String productName,
@@ -48,6 +50,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.createProduct(productDto, image));
     }
 
+    //제품 수정
     @PutMapping("/{id}")
     public ResponseEntity<ProductDto> updateProduct(
             @PathVariable Long id,
@@ -63,6 +66,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.updateProduct(productDto, image));
     }
 
+    //제품 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);

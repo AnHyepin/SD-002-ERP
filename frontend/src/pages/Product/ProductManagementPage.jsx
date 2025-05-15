@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
     Box,
@@ -24,12 +25,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 const ProductManagementPage = () => {
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [open, setOpen] = useState(false);
     const [formData, setFormData] = useState({
         productId: '',
         productName: '',
-        description: '',
+        productDesc: '',
         price: '',
         image: null
     });
@@ -67,16 +69,16 @@ const ProductManagementPage = () => {
             setFormData({
                 productId: product.productId,
                 productName: product.productName,
-                description: product.description,
+                productDesc: product.productDesc,
                 price: product.price,
                 image: null
             });
-            setPreviewUrl(product.imageUrl || '');
+            setPreviewUrl(product.image ? `${product.image}` : '/uploads/default.jpg');
         } else {
             setFormData({
                 productId: '',
                 productName: '',
-                description: '',
+                productDesc: '',
                 price: '',
                 image: null
             });
@@ -90,30 +92,34 @@ const ProductManagementPage = () => {
         try {
             const formDataToSend = new FormData();
             formDataToSend.append('productName', formData.productName);
-            formDataToSend.append('description', formData.description);
+            formDataToSend.append('productDesc', formData.productDesc);
             formDataToSend.append('price', formData.price);
             if (formData.image) {
                 formDataToSend.append('image', formData.image);
             }
 
+            let productId = null;
+
             if (formData.productId) {
                 // 수정
-                await axios.put(`/api/product/${formData.productId}`, formDataToSend, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
+                await axios.put(`/api/product/${formData.productId}`, formDataToSend);
             } else {
                 // 등록
-                await axios.post('/api/product', formDataToSend, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
+                const res = await axios.post('/api/product', formDataToSend);
+                productId = res.data.productId;
             }
 
             fetchProducts();
             setOpen(false);
+
+            //BOM 등록 페이지로 이동
+            if (!formData.productId) {
+                const confirmGoToBom = window.confirm('완제품 등록 완료! BOM 등록하시겠습니까?');
+                if (confirmGoToBom) {
+                    navigate(`/Product/bom?productId=${productId}&mode=open`);
+                }
+            }
+
         } catch (error) {
             console.error('제품 저장 실패:', error);
             alert('제품 저장에 실패했습니다.');
@@ -164,7 +170,7 @@ const ProductManagementPage = () => {
                                 <TableRow key={product.productId}>
                                     <TableCell>
                                         <img
-                                            src={product.imageUrl || '/default-product.png'}
+                                            src={product.image || 'http://localhost:3000/uploads/dc4e8208-a347-411d-91ba-df64ca4e4d34.jpg'}
                                             alt={product.productName}
                                             style={{
                                                 width: '80px',
@@ -175,7 +181,7 @@ const ProductManagementPage = () => {
                                         />
                                     </TableCell>
                                     <TableCell>{product.productName}</TableCell>
-                                    <TableCell>{product.description}</TableCell>
+                                    <TableCell>{product.productDesc}</TableCell>
                                     <TableCell>{product.price.toLocaleString()}원</TableCell>
                                     <TableCell align="center">
                                         <IconButton
@@ -238,8 +244,8 @@ const ProductManagementPage = () => {
                             />
                             <TextField
                                 label="설명"
-                                value={formData.description}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                value={formData.productDesc}
+                                onChange={(e) => setFormData({ ...formData, productDesc: e.target.value })}
                                 multiline
                                 rows={3}
                                 fullWidth

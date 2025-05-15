@@ -24,7 +24,7 @@ const Nav = () => {
     inventory: {
       title: '재고',
       subItems: [
-        { name: '분사 재고 조회', path: '/inventory/branch' },
+        { name: '본사 재고 조회', path: '/inventory/branch' },
         { name: '매장 재고 조회', path: '/inventory/store' }
       ]
     },

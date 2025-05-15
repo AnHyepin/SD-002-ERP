@@ -26,8 +26,12 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useSearchParams } from 'react-router-dom';
 
 const BomManagementPage3 = () => {
+    const [searchParams] = useSearchParams();
+    const autoProductId = searchParams.get('productId');
+    const mode = searchParams.get('mode');
     // 상태 관리
     const [productList, setProductList] = useState([]);
     const [materialList, setMaterialList] = useState([]);
@@ -37,8 +41,6 @@ const BomManagementPage3 = () => {
     const [searchKeyword, setSearchKeyword] = useState('');
     const [isEditMode, setIsEditMode] = useState(false);
     const [open, setOpen] = useState(false);
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [formData, setFormData] = useState({
         productId: '',
         productName: '',
@@ -97,6 +99,13 @@ const BomManagementPage3 = () => {
 
         setFilteredBomList(filtered);
     }, [selectedProduct, searchKeyword, bomList]);
+
+    //완제품 등록 후 바로 BOM 등록
+    useEffect(() => {
+        if (autoProductId && mode === 'open') {
+            handleOpen({ productId: autoProductId });
+        }
+    }, [autoProductId, mode]);
 
     // BOM 등록/수정 다이얼로그 열기
     const handleOpen = (product = null) => {

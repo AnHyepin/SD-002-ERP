@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.backend.dao.sangin.ShipmentDao">
+
+    <select id="findAllShipments" resultType="com.example.backend.dto.ShipmentDto">
+        SELECT
+            l.shipment_id,
+            l.order_id,
+            l.store_id,
+            s.store_name,
+            l.material_id,
+            m.material_name,
+            l.quantity,
+            m.unit,
+            l.shipped_at
+        FROM tbl_shipment_log l
+                 JOIN tbl_store s ON l.store_id = s.store_id
+                 JOIN tbl_material m ON l.material_id = m.material_id
+        ORDER BY l.shipped_at DESC
+    </select>
+
+</mapper>
+

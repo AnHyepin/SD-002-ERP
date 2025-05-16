@@ -22,7 +22,7 @@ public class JwtTokenProvider {
     private static final String TOKEN_COOKIE_NAME = "provider00";
 
     // JWT 생성
-    public String createToken(String userId, String username, String role) {
+    public String createToken(String userId, String username, String role, Integer storeId) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + expiration);
 
@@ -30,6 +30,7 @@ public class JwtTokenProvider {
                 .setSubject(userId) // user_id 저장
                 .claim("username", username) //
                 .claim("role", role) // 사용자 역할 저장
+                .claim("storeId", storeId)
                 .setIssuedAt(now)//발급기간
                 .setExpiration(validity) // 유효기간
                 .signWith(SignatureAlgorithm.HS256, secretKey) //비밀키서명
@@ -99,6 +100,11 @@ public class JwtTokenProvider {
             }
         }
         return null;
+    }
+
+    public Integer getStoreIdFromToken(String token) {
+        Claims claims = parseClaims(token);
+        return claims.get("storeId", Integer.class);
     }
 
     private boolean isLocalEnvironment() {

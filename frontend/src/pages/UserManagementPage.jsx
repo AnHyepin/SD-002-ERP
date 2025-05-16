@@ -27,6 +27,7 @@ import axios from 'axios';
 
 const UserManagementPage = () => {
     const [users, setUsers] = useState([]);
+    const [stores, setStores] = useState([]);
     const [open, setOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [formData, setFormData] = useState({
@@ -34,10 +35,12 @@ const UserManagementPage = () => {
         email: '',
         role: 'USER',
         isActive: true,
+        storeId: null,
     });
 
     useEffect(() => {
         fetchUsers();
+        fetchStores();
     }, []);
 
     const fetchUsers = async () => {
@@ -46,6 +49,15 @@ const UserManagementPage = () => {
             setUsers(response.data);
         } catch (error) {
             console.error('사용자 목록을 불러오는데 실패했습니다:', error);
+        }
+    };
+
+    const fetchStores = async () => {
+        try {
+            const response = await axios.get('/api/stores');
+            setStores(response.data);
+        } catch (error) {
+            console.error('매장 목록을 불러오는데 실패했습니다:', error);
         }
     };
 
@@ -60,6 +72,7 @@ const UserManagementPage = () => {
                 email: '',
                 role: 'USER',
                 isActive: true,
+                storeId: null,
             });
         }
         setOpen(true);
@@ -110,6 +123,7 @@ const UserManagementPage = () => {
                             <TableCell>사용자명</TableCell>
                             <TableCell>이메일</TableCell>
                             <TableCell>권한</TableCell>
+                            <TableCell>매장</TableCell>
                             <TableCell>상태</TableCell>
                             <TableCell>관리</TableCell>
                         </TableRow>
@@ -124,6 +138,9 @@ const UserManagementPage = () => {
                                     {user.role === 'ROLE_ADMIN' ? '관리자' :
                                     user.role === 'ROLE_MANAGER' ? '매니저' :
                                         user.role === 'ROLE_STORE' ? '매장' : '알 수 없음'}
+                                </TableCell>
+                                <TableCell>
+                                    {stores.find(store => store.storeId === user.storeId)?.storeName || '-'}
                                 </TableCell>
                                 <TableCell>{user.isActive ? '활성' : '비활성'}</TableCell>
                                 <TableCell>
@@ -171,6 +188,21 @@ const UserManagementPage = () => {
                                 <MenuItem value="ROLE_ADMIN">관리자</MenuItem>
                                 <MenuItem value="ROLE_MANAGER">매니저</MenuItem>
                                 <MenuItem value="ROLE_STORE">일반 사용자</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <FormControl fullWidth margin="normal">
+                            <InputLabel>매장</InputLabel>
+                            <Select
+                                value={formData.storeId || ''}
+                                label="매장"
+                                onChange={(e) => setFormData({...formData, storeId: e.target.value})}
+                            >
+                                <MenuItem value="">선택 안함</MenuItem>
+                                {stores.map((store) => (
+                                    <MenuItem key={store.storeId} value={store.storeId}>
+                                        {store.storeName}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                         <FormControl fullWidth margin="normal">

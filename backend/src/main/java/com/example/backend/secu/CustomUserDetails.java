@@ -12,12 +12,14 @@ public class CustomUserDetails implements UserDetails {
     private final String username;
     private final String password;
     private final String role; // ✅ 역할 추가
+    private final Integer storeId;
 
-    public CustomUserDetails(String userId, String username, String password, String role) {
+    public CustomUserDetails(String userId, String username, String password, String role, Integer storeId) {
         this.userId = userId;
         this.username = username;
         this.password = password;
         this.role = role;
+        this.storeId = storeId;
     }
 
     @Override
@@ -39,6 +41,9 @@ public class CustomUserDetails implements UserDetails {
     }
     public String getRole() {
         return role;
+    }
+    public Integer getStoreId() {
+        return storeId;
     }
 
     @Override

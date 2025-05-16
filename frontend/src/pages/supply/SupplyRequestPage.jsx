@@ -1,16 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  Chip,
+  Box, Typography, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Button, Chip
 } from '@mui/material';
 import axios from 'axios';
 
@@ -40,19 +31,25 @@ const SupplyRequestPage = () => {
 
   const handleStatusChange = async (requestId, newStatus) => {
     try {
-      await axios.put(`/api/supply/requests/${requestId}/status`, {
-        status: newStatus
-      });
-      fetchRequests(); // 목록 새로고침
+      await axios.put(`/api/supply/requests/${requestId}/status`, { status: newStatus });
+      fetchRequests();
     } catch (error) {
       console.error('상태 변경 실패:', error);
+    }
+  };
+
+  const handleStartDelivery = async (requestId) => {
+    try {
+      await axios.post('/api/supply/orders', { requestId });
+      fetchRequests();
+    } catch (error) {
+      console.error('출고 지시 생성 실패:', error);
     }
   };
 
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" sx={{ mb: 3 }}>공급 요청 관리</Typography>
-
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -72,49 +69,19 @@ const SupplyRequestPage = () => {
                 <TableCell>{request.storeName}</TableCell>
                 <TableCell>{request.requestedAt}</TableCell>
                 <TableCell>
-                  <Chip
-                    label={statusMap[request.status]?.label}
-                    color={statusMap[request.status]?.color}
-                    size="small"
-                  />
+                  <Chip label={statusMap[request.status]?.label} color={statusMap[request.status]?.color} size="small" />
                 </TableCell>
                 <TableCell>
-                  {request.items.map((item, index) => (
-                    <div key={index}>
-                      {item.materialName}: {item.quantity} {item.unit}
-                    </div>
+                  {request.items.map((item, i) => (
+                    <div key={i}>{item.materialName}: {item.quantity} {item.unit}</div>
                   ))}
                 </TableCell>
                 <TableCell>
                   {request.status === 'R' && (
                     <>
-                      <Button
-                        size="small"
-                        variant="contained"
-                        color="success"
-                        onClick={() => handleStatusChange(request.requestId, 'A')}
-                        sx={{ mr: 1 }}
-                      >
-                        승인
-                      </Button>
-                      <Button
-                        size="small"
-                        variant="contained"
-                        color="error"
-                        onClick={() => handleStatusChange(request.requestId, 'X')}
-                      >
-                        취소
-                      </Button>
+                      <Button size="small" variant="contained" color="success" onClick={() => handleStatusChange(request.requestId, 'A')} sx={{ mr: 1 }}>승인</Button>
+                      <Button size="small" variant="contained" color="error" onClick={() => handleStatusChange(request.requestId, 'X')}>취소</Button>
                     </>
-                  )}
-                  {request.status === 'A' && (
-                    <Button
-                      size="small"
-                      variant="contained"
-                      onClick={() => handleStatusChange(request.requestId, 'S')}
-                    >
-                      출고 시작
-                    </Button>
                   )}
                 </TableCell>
               </TableRow>
@@ -126,4 +93,4 @@ const SupplyRequestPage = () => {
   );
 };
 
-export default SupplyRequestPage; 
+export default SupplyRequestPage;

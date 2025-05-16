@@ -26,7 +26,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             String token = jwtTokenProvider.createToken(
                     userDetails.getUserId(), // userId
                     userDetails.getUsername(), // ✅ username
-                    userDetails.getRole() // role
+                    userDetails.getRole(), // role
+                    userDetails.getStoreId() // storeId
             );
 
 

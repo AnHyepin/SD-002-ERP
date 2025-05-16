@@ -21,5 +21,22 @@
         WHERE i.store_id = #{storeId}
     </select>
 
+    <!-- 본사 재고 차감 -->
+    <update id="decreaseInventory">
+        UPDATE tbl_inventory
+        SET quantity = quantity - #{quantity}
+        WHERE store_id = #{storeId}
+          AND material_id = #{materialId}
+    </update>
+
+    <!-- 매장 재고 증가 또는 신규 insert -->
+    <update id="increaseInventory">
+        INSERT INTO tbl_inventory (store_id, material_id, quantity)
+        VALUES (#{storeId}, #{materialId}, #{quantity})
+            ON DUPLICATE KEY UPDATE
+                                 quantity = quantity + #{quantity}
+    </update>
+
+
 </mapper>
 

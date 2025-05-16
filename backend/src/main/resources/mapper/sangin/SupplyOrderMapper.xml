@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.backend.dao.sangin.SupplyOrderDao">
+
+    <!-- 출고 지시서 목록 -->
+    <select id="findAllOrders" resultType="com.example.backend.dto.SupplyOrderDto">
+        SELECT
+            o.order_id,
+            o.request_id,
+            r.store_id,
+            s.store_name,
+            o.status,
+            o.approved_at
+        FROM tbl_supply_order o
+                 JOIN tbl_supply_request r ON o.request_id = r.request_id
+                 JOIN tbl_store s ON r.store_id = s.store_id
+    </select>
+
+    <!-- 해당 지시서의 자재 목록 -->
+    <select id="findItemsByOrderId" resultType="com.example.backend.dto.SupplyOrderItemDto">
+        SELECT
+            i.material_id,
+            m.material_name,
+            i.quantity,
+            m.unit
+        FROM tbl_supply_order o
+                 JOIN tbl_supply_request r ON o.request_id = r.request_id
+                 JOIN tbl_supply_item i ON r.request_id = i.request_id
+                 JOIN tbl_material m ON i.material_id = m.material_id
+        WHERE o.order_id = #{orderId}
+    </select>
+
+    <insert id="insertOrderByRequestId">
+        INSERT INTO tbl_supply_order (
+            request_id,
+            approved_by,
+            status
+        )
+        VALUES (
+                   #{requestId},
+                   #{approvedBy},
+                   'A'
+               )
+    </insert>
+
+    <insert id="insertShipmentLog">
+        INSERT INTO tbl_shipment_log (order_id, store_id, material_id, quantity)
+        VALUES (#{orderId}, #{storeId}, #{materialId}, #{quantity})
+    </insert>
+
+    <update id="markOrderAsShipped">
+        UPDATE tbl_supply_order
+        SET status = 'D'
+        WHERE order_id = #{orderId}
+    </update>
+
+    <update id="updateOrderStatus">
+        UPDATE tbl_supply_order
+        SET status = #{status}
+        WHERE order_id = #{orderId}
+    </update>
+
+    <select id="findStoreIdByOrderId" resultType="java.lang.Long">
+        SELECT r.store_id
+        FROM tbl_supply_order o
+        JOIN tbl_supply_request r ON o.request_id = r.request_id
+        WHERE o.order_id = #{orderId}
+    </select>
+
+</mapper>

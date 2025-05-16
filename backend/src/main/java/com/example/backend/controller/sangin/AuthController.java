@@ -37,12 +37,19 @@ public class AuthController {
             String token = jwtTokenProvider.createToken(
                     userDetails.getUserId(), // userId
                     userDetails.getUsername(), // ✅ username
-                    userDetails.getRole() // role
+                    userDetails.getRole(), // role
+                    userDetails.getStoreId() // storeId
             );
+            System.out.println("로그인 api 실행");
+            System.out.println(" userdetails.getUserId(): " + userDetails.getUserId());
+            System.out.println(" userdetails.getUsername(): " + userDetails.getUsername());
+            System.out.println(" userdetails.getRole(): " + userDetails.getRole());
+            System.out.println(" userdetails.getStoreId(): " + userDetails.getStoreId());
 
             jwtTokenProvider.addTokenToCookie(response, token);
 
             return ResponseEntity.ok(new LoginResponse(
+                userDetails.getUserId(), // userId
                 userDetails.getUsername(),
                 userDetails.getRole(),
                 token
@@ -66,6 +73,21 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUserInfo(Authentication authentication) {
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            return ResponseEntity.ok(new UserInfoResponse(
+                userDetails.getUserId(),
+                userDetails.getUsername(),
+                userDetails.getRole(),
+                userDetails.getStoreId()
+            ));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
+        }
+    }
+
     @Data
     static class LoginRequest {
         private String username;
@@ -74,9 +96,17 @@ public class AuthController {
 
     @Data
     static class LoginResponse {
-        private String userId;
+        private final String userId;
         private final String username;
         private final String role;
         private final String token;
+    }
+
+    @Data
+    static class UserInfoResponse {
+        private final String userId;
+        private final String username;
+        private final String role;
+        private final Integer storeId;
     }
 } 

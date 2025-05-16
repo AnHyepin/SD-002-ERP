@@ -31,10 +31,24 @@ const StoreInventoryPage = () => {
   const [openRequestDialog, setOpenRequestDialog] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [requestQuantity, setRequestQuantity] = useState('');
+  const [storeId, setStoreId] = useState(null);
 
-  const storeId = 2; // 예시: 실제로는 localStorage.getItem('storeId') 또는 props 등에서 가져와야 함 수정수정
-
+  // 사용자 정보에서 storeId 받아오기
   useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const res = await axios.get('/api/auth/me');
+        setStoreId(res.data.storeId);
+      } catch (e) {
+        console.error('사용자 정보 로드 실패:', e);
+      }
+    };
+    fetchUserInfo();
+  }, []);
+
+  // storeId가 있을 때만 재고 불러오기
+  useEffect(() => {
+    if (!storeId) return;
     const fetchInventory = async () => {
       try {
         const response = await axios.get(`/api/inventory/store?storeId=${storeId}`);
@@ -44,10 +58,8 @@ const StoreInventoryPage = () => {
         console.error('재고 데이터 로드 실패:', error);
       }
     };
-
     fetchInventory();
   }, [storeId]);
-
 
   // 검색어와 카테고리 필터 적용
   useEffect(() => {

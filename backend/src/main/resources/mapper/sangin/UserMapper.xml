@@ -13,7 +13,8 @@
         SET username = #{username},
             email = #{email},
             role = #{role},
-            is_active = #{isActive}
+            is_active = #{isActive},
+            store_id = #{storeId}
         WHERE user_id = #{userId}
     </update>
 
